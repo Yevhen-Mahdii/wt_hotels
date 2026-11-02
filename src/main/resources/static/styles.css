@@ -334,8 +334,8 @@ input[type="checkbox"] {
 }
 .OCCUPIED,
 .CHECKED_IN {
-  background: #dce6df;
-  color: #28553e;
+  background: #d6bf99;
+  color: #593e18;
 }
 .CLEANING {
   background: #ece3ee;
