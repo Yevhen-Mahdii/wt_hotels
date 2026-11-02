@@ -1,0 +1,29 @@
+@startuml
+title Фізичний стан номера
+skinparam backgroundColor #FAF9F3
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam ArrowColor #70553F
+skinparam classBackgroundColor #E4EDDC
+skinparam activityBackgroundColor #E4EDDC
+skinparam sequenceParticipantBackgroundColor #E4EDDC
+state "Вільно\nFREE" as Free
+state "Зайнято\nOCCUPIED" as Occupied
+state "Клінінг\nCLEANING" as Cleaning
+[*] --> Free : Створення номера
+Free --> Occupied : Керуючий: заселення\nзафіксувати ціну та час
+Occupied --> Cleaning : Керуючий: виселення\nзавершити проживання та записати дохід
+Cleaning --> Free : Керуючий: клінінг завершено
+note right of Free
+ Усі переходи виконує Керуючий свого готелю.
+ Сервер блокує номер і перевіряє вихідний стан.
+ О 12:00 автоматичних переходів немає.
+end note
+note bottom of Occupied
+ Майбутні бронювання існують окремо.
+ RESERVED — позначка на календарі,
+ а не фізичний стан номера.
+ Історія клінінгу не зберігається.
+end note
+@enduml

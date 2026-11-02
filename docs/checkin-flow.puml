@@ -1,0 +1,43 @@
+@startuml
+title Заселення у номер
+skinparam backgroundColor #FAF9F3
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam ArrowColor #70553F
+skinparam classBackgroundColor #E4EDDC
+skinparam activityBackgroundColor #E4EDDC
+skinparam sequenceParticipantBackgroundColor #E4EDDC
+start
+:Керуючий обирає номер\nі, за потреби, бронювання;
+:Почати транзакцію; перевірити роль;\nзаблокувати номер та перевірити готель;
+if (Номер FREE?) then (так)
+else (ні)
+  :Відхилити: спочатку звільнити\nномер і завершити клінінг;
+  stop
+endif
+if (Вказано бронювання?) then (так)
+  if (Той самий номер, RESERVED\nі сьогодні в [заїзд, виїзд)?) then (так)
+    :Перевести бронювання у CHECKED_IN;
+  else (ні)
+    :Відхилити невідповідне бронювання;\nвідкотити транзакцію;
+    stop
+  endif
+else (ні)
+  if (Є активне бронювання на сьогодні?) then (так)
+    :Відхилити: потрібне заселення\nза відповідним бронюванням;
+    stop
+  else (ні)
+    :Дозволити заселення без бронювання;
+  endif
+endif
+:Створити проживання;\nзафіксувати поточний час і ціну номера;
+:Перевести номер у OCCUPIED;\nзафіксувати транзакцію;
+stop
+note right
+ Доступність бронювання перевіряється
+ за поточною календарною датою Києва.
+ Межа 12:00 використовується для обліку ночей.
+ Дані гостей не вводяться.
+end note
+@enduml

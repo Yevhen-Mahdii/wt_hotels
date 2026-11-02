@@ -1,0 +1,55 @@
+@startuml
+title Вхід і перевірка доступу
+skinparam backgroundColor #FAF9F3
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam ArrowColor #70553F
+skinparam classBackgroundColor #E4EDDC
+skinparam activityBackgroundColor #E4EDDC
+skinparam sequenceParticipantBackgroundColor #E4EDDC
+actor "Користувач" as User
+participant "Браузер" as UI
+participant "AuthService" as Auth
+participant "Spring Security" as Security
+participant "HotelTokenConverter" as Converter
+participant "Контролер / сервіс" as API
+database "БД" as DB
+User -> UI : Email + пароль
+UI -> Auth : POST /api/auth/login (через контролер)
+Auth -> DB : Знайти користувача за нормалізованим email
+Auth -> Auth : Перевірити BCrypt-хеш
+alt Невірні облікові дані
+  Auth --> UI : 401
+else Успішний вхід
+  Auth --> UI : JWT (user id, issuer, строк 8 годин) + user
+  UI -> UI : Зберегти JWT у sessionStorage
+end
+== Кожен захищений запит ==
+UI -> Security : Authorization: Bearer JWT
+Security -> Security : Перевірити підпис, issuer та строк дії
+alt JWT відсутній або невалідний
+  Security --> UI : 401
+else JWT валідний
+  Security -> Converter : convert(jwt)
+  Converter -> DB : Поточний користувач за subject
+  alt Користувача немає або subject некоректний
+    Converter --> Security : InvalidBearerTokenException
+    Security --> UI : 401
+  else Користувач існує
+    Converter --> Security : HotelToken(userId, email, role, hotelId)
+    Security -> API : @AuthenticationPrincipal HotelToken
+    API -> API : hasRole(...) + перевірка доступу до готелю
+    alt Недостатньо прав
+      API --> UI : 403
+    else Доступ дозволено
+      API --> UI : Результат операції
+    end
+  end
+end
+note over Converter, DB
+ Роль і готель читаються з БД для кожного запиту.
+ Ролі не успадковують права одна одної.
+ Вихід очищає токен у браузері; серверного списку відкликання немає.
+end note
+@enduml

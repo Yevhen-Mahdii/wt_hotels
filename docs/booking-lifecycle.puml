@@ -1,0 +1,33 @@
+@startuml
+title Життєвий цикл бронювання
+skinparam backgroundColor #FAF9F3
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam ArrowColor #70553F
+skinparam classBackgroundColor #E4EDDC
+skinparam activityBackgroundColor #E4EDDC
+skinparam sequenceParticipantBackgroundColor #E4EDDC
+state "Заброньовано\nRESERVED" as Reserved
+state "Заселено\nCHECKED_IN" as CheckedIn
+state "Завершено\nCOMPLETED" as Completed
+state "Скасовано\nCANCELLED" as Cancelled
+[*] --> Reserved : Адміністратор створює бронювання
+Reserved --> Reserved : Адміністратор змінює дати\nповторна перевірка перетинів
+Reserved --> Cancelled : Адміністратор скасовує\nпід блокуванням номера
+Reserved --> CheckedIn : Керуючий заселяє за бронюванням
+CheckedIn --> Completed : Керуючий виселяє
+Completed --> [*]
+Cancelled --> [*]
+note right of Reserved
+ Змінювати й скасовувати можна лише RESERVED.
+ Для перенесення на інший номер потрібно
+ скасувати та створити нове бронювання.
+ Закінчення дат не змінює статус автоматично.
+end note
+note bottom of CheckedIn
+ RESERVED і CHECKED_IN блокують перетин
+ бронювань у межах своїх дат.
+ Скасування не створює дохід.
+end note
+@enduml

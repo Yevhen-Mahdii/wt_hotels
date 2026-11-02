@@ -1,0 +1,54 @@
+@startuml
+title Пошук і збереження бронювання
+skinparam backgroundColor #FAF9F3
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam ArrowColor #70553F
+skinparam classBackgroundColor #E4EDDC
+skinparam activityBackgroundColor #E4EDDC
+skinparam sequenceParticipantBackgroundColor #E4EDDC
+actor "Адміністратор" as Operator
+participant "Інтерфейс" as UI
+participant "BookingController" as API
+participant "BookingService" as Service
+database "H2" as DB
+note over API, Service
+ Захищені запити вже мають перевірений HotelToken.
+ Невірна роль → 403; некоректні параметри → 400.
+end note
+Operator -> UI : Дати, кількість ліжок, готель
+UI -> API : GET /api/rooms/search
+API -> Service : search(token, start, end, beds, hotelId)
+Service -> DB : Номери без перетину активних бронювань
+DB --> Service : Номери
+Service --> UI : exact: точно за ліжками\nlarger: більше ліжок
+note over UI, DB
+ Пошук не резервує номер.
+ Поточний OCCUPIED/CLEANING не виключає майбутнє бронювання.
+end note
+Operator -> UI : Створити або змінити дати
+UI -> API : POST /api/bookings або PUT /api/bookings/{id}
+API -> Service : save(token, id, input)
+group Одна транзакція
+  Service -> Service : Перевірити роль і дати
+  Service -> DB : Заблокувати номер (FOR UPDATE)
+  opt Зміна існуючого бронювання
+    Service -> DB : Завантажити бронювання після блокування
+    Service -> Service : Той самий номер; статус RESERVED
+  end
+  Service -> DB : Повторна перевірка перетину\nRESERVED / CHECKED_IN; виключити власний id
+  alt Є перетин або неприпустима зміна
+    Service -> DB : ROLLBACK, звільнити блокування
+    Service --> UI : 409 (перетин / статус) або 400 (інший номер)
+  else Перевірки пройдено
+    Service -> DB : INSERT / UPDATE booking; COMMIT
+    Service --> UI : Збережене бронювання
+  end
+end
+note over Service, DB
+ Інтервали [заїзд, виїзд): виїзд і наступний заїзд
+ в один день не перетинаються.
+ Блокування утримується до завершення транзакції.
+end note
+@enduml

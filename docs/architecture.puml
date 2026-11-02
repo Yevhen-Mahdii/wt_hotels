@@ -1,0 +1,43 @@
+@startuml
+title Архітектура та розгортання
+skinparam backgroundColor #FAF9F3
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam ArrowColor #70553F
+skinparam classBackgroundColor #E4EDDC
+skinparam activityBackgroundColor #E4EDDC
+skinparam sequenceParticipantBackgroundColor #E4EDDC
+top to bottom direction
+actor "Працівник мережі" as Staff
+node "Смартфон / комп’ютер" {
+  component "Браузер\nHTML / CSS / JavaScript" as Browser
+}
+node "Один Docker-контейнер" {
+  component "Spring Boot\nСтатичні файли + REST-контролери" as Web
+  component "Spring Security\nJWT → HotelToken" as Security
+  component "Сервіси\nПрава та бізнес-правила" as Services
+  component "Репозиторії / Hibernate" as ORM
+  component "Flyway" as Flyway
+  database "H2 embedded\nу процесі застосунку" as DB
+}
+folder "./data на хості\nпідключено як /app/data" as Data {
+  artifact "hotels.mv.db" as DatabaseFile
+  artifact "jwt.key" as Key
+}
+Staff --> Browser
+Browser --> Web : HTTP: сторінки та API
+Web --> Security : захищені API-запити
+Security --> ORM : поточний користувач і роль
+Web --> Services : HotelToken + DTO
+Services --> ORM
+ORM --> DB
+Flyway --> DB : V1 при створенні БД
+DB --> DatabaseFile
+Security --> Key : ключ підпису JWT
+note bottom of Web
+ Інтерфейс завантажується із сервера,
+ але виконується у браузері.
+ Окремого сервера БД немає.
+end note
+@enduml
