@@ -24,7 +24,11 @@ public class CalendarDayFactory {
         bookingIds.add(booking.getId());
       }
     }
-    if (stays.stream().anyMatch(stay -> occupies(stay, date, today)))
+    // Today reflects availability now; a completed billable day must not keep a room occupied.
+    boolean occupied = date.equals(today)
+        ? room.getState() == RoomState.OCCUPIED
+        : stays.stream().anyMatch(stay -> occupies(stay, date, today));
+    if (occupied)
       states.add(RoomState.OCCUPIED.name());
     if (date.equals(today) && room.getState() == RoomState.CLEANING)
       states.add(RoomState.CLEANING.name());
