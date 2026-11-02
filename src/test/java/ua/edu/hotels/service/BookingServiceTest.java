@@ -91,6 +91,31 @@ class BookingServiceTest {
   }
 
   @Test
+  void editingCannotMoveBookingToAnotherRoom() {
+    Booking existing = booking();
+    existing.setRoomId(99L);
+    when(roomService.lock(20L)).thenReturn(room(RoomState.FREE));
+    when(bookingRepository.findById(30L)).thenReturn(Optional.of(existing));
+    assertThatThrownBy(() -> bookingService.save(user(Role.ADMINISTRATOR), 30L, input()))
+        .isInstanceOf(ResponseStatusException.class);
+    assertThat(existing.getRoomId()).isEqualTo(99L);
+    verify(bookingRepository, never()).save(any());
+  }
+
+  @Test
+  void editingExcludesOwnBookingFromOverlapCheck() {
+    Booking existing = booking();
+    when(roomService.lock(20L)).thenReturn(room(RoomState.FREE));
+    when(bookingRepository.findById(30L)).thenReturn(Optional.of(existing));
+    var changed = new BookingInput(20L, input().startDate().plusDays(1), input().endDate().plusDays(1));
+    bookingService.save(user(Role.ADMINISTRATOR), 30L, changed);
+    verify(bookingRepository).hasOverlap(20L, changed.startDate(), changed.endDate(), 30L,
+        List.of(BookingStatus.RESERVED, BookingStatus.CHECKED_IN));
+    assertThat(existing.getStartDate()).isEqualTo(changed.startDate());
+    assertThat(existing.getEndDate()).isEqualTo(changed.endDate());
+  }
+
+  @Test
   void cannotCancelCheckedInBooking() {
     Booking booking = booking();
     booking.setStatus(BookingStatus.CHECKED_IN);

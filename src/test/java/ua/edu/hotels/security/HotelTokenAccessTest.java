@@ -1,5 +1,8 @@
 package ua.edu.hotels.security;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.assertj.core.api.Assertions.*;
 import static ua.edu.hotels.support.Fixtures.user;
 
@@ -10,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ua.edu.hotels.data.enums.Role;
 
 /** Checks role restrictions and prevents managers from accessing another hotel. */
+@ExtendWith(MockitoExtension.class)
 class HotelTokenAccessTest {
 
   @ParameterizedTest

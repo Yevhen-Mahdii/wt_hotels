@@ -1,5 +1,8 @@
 package ua.edu.hotels.service;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.assertj.core.api.Assertions.*;
 import static ua.edu.hotels.support.Fixtures.CLOCK;
 
@@ -9,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 /** Checks noon boundaries and minimum-night accounting using a deterministic clock. */
+@ExtendWith(MockitoExtension.class)
 class StayCalculatorTest {
   private final StayCalculator stayCalculator = new StayCalculator(CLOCK);
 
