@@ -22,17 +22,16 @@ public class UserService {
   private final UserRepository userRepository;
   private final HotelService hotelService;
   private final PasswordService passwordService;
-  private final AccessPolicy accessPolicy;
   private final RoleService roleService;
 
   public List<User> list(HotelToken actor) {
-    accessPolicy.requireRole(actor, Role.ADMIN);
+    actor.requireRole(Role.ADMIN);
     return userRepository.findAllByOrderByEmailAsc();
   }
 
   @Transactional
   public User create(HotelToken actor, UserInput input) {
-    accessPolicy.requireRole(actor, Role.ADMIN);
+    actor.requireRole(Role.ADMIN);
     if (input.role() == Role.MANAGER) hotelService.get(input.hotelId());
     else if (input.hotelId() != null)
       throw new ResponseStatusException(BAD_REQUEST, "Готель призначається лише Керуючому");

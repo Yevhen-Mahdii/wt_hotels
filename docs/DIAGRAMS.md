@@ -7,7 +7,7 @@
 | [Архітектура](architecture.puml) | Технічний | Браузер, один контейнер, Spring Security, сервіси, H2 та папка даних | `SecurityConfig`, `compose.yaml` |
 | [Модель предметної області](domain.puml) | Логічний | Ролі, користувачі, готелі, номери, бронювання, проживання й дохід; кратності зв’язків | `data/entity`, V1 |
 | [Початкове налаштування](setup-flow.puml) | Процес | Синхронізація ролей, захист повторного setup, створення мережі й номерів | `HotelsApplication`, `AuthService`, `UserService` |
-| [Вхід і доступ](authentication-sequence.puml) | Технічний | JWT → HotelToken, поточна роль із БД, 401 і 403 | `JwtService`, `HotelTokenConverter`, `AccessPolicy` |
+| [Вхід і доступ](authentication-sequence.puml) | Технічний | JWT → HotelToken, поточна роль із БД, 401 і 403 | `JwtService`, `HotelTokenConverter`, `HotelToken` |
 | [Пошук і бронювання](booking-sequence.puml) | Технічний | Точні / більші номери, повторна перевірка перетинів під блокуванням, commit / rollback | `BookingService`, `RoomRepository` |
 | [Стани бронювання](booking-lifecycle.puml) | Логічний | Створення, зміна дат, скасування, заселення та завершення | `BookingService`, `StayService` |
 | [Стани номера](room-lifecycle.puml) | Логічний | FREE → OCCUPIED → CLEANING → FREE, окремо від бронювань | `StayService` |

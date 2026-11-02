@@ -20,14 +20,13 @@ import ua.edu.hotels.security.HotelToken;
 @Transactional(readOnly = true)
 public class RevenueService {
   private final RevenueRepository revenueRepository;
-  private final AccessPolicy accessPolicy;
   private final DateRangePolicy dateRangePolicy;
   private final StayCalculator stayCalculator;
 
   public RevenueSummary summarize(HotelToken actor, LocalDate start, LocalDate end, Long hotelId) {
-    accessPolicy.requireRevenueAccess(actor);
+    actor.requireRevenueAccess();
     dateRangePolicy.validate(start, end);
-    Long filter = accessPolicy.hotelFilter(actor, hotelId);
+    Long filter = actor.hotelFilter(hotelId);
     var items =
         revenueRepository.findForPeriod(
             stayCalculator.boundary(start), stayCalculator.boundary(end), filter);

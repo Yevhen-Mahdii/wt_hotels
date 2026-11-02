@@ -27,7 +27,7 @@ class RevenueServiceTest {
   void setup() {
     revenueService =
         new RevenueService(
-            revenueRepository, new AccessPolicy(), new DateRangePolicy(CLOCK), stayCalculator);
+            revenueRepository, new DateRangePolicy(CLOCK), stayCalculator);
   }
 
   @Test

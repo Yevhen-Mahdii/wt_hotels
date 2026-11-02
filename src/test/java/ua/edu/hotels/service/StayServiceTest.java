@@ -34,7 +34,6 @@ class StayServiceTest {
             bookingRepository,
             bookingService,
             revenueRepository,
-            new AccessPolicy(),
             new StayCalculator(CLOCK),
             CLOCK);
   }

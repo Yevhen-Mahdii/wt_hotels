@@ -23,7 +23,6 @@ public class BookingService {
       List.of(BookingStatus.RESERVED, BookingStatus.CHECKED_IN);
   private final BookingRepository bookingRepository;
   private final RoomService roomService;
-  private final AccessPolicy accessPolicy;
   private final DateRangePolicy dateRangePolicy;
 
   public boolean overlaps(Long roomId, LocalDate start, LocalDate end, Long excludedId) {
@@ -32,7 +31,7 @@ public class BookingService {
 
   public SearchResult search(
       HotelToken actor, LocalDate start, LocalDate end, int beds, Long hotelId) {
-    accessPolicy.requireRole(actor, Role.ADMINISTRATOR);
+    actor.requireRole(Role.ADMINISTRATOR);
     dateRangePolicy.validateBooking(start, end);
     if (beds < 1 || beds > 20)
       throw new ResponseStatusException(BAD_REQUEST, "Кількість ліжок: від 1 до 20");
@@ -52,7 +51,7 @@ public class BookingService {
 
   @Transactional
   public Booking save(HotelToken actor, Long id, BookingInput input) {
-    accessPolicy.requireRole(actor, Role.ADMINISTRATOR);
+    actor.requireRole(Role.ADMINISTRATOR);
     dateRangePolicy.validateBooking(input.startDate(), input.endDate());
     // Lock before checking overlap so simultaneous requests cannot both reserve the same interval.
     Room room = roomService.lock(input.roomId());
@@ -76,7 +75,7 @@ public class BookingService {
 
   @Transactional
   public Booking cancel(HotelToken actor, Long id) {
-    accessPolicy.requireRole(actor, Role.ADMINISTRATOR);
+    actor.requireRole(Role.ADMINISTRATOR);
     // Scalar lookup avoids loading a stale entity before waiting for the room lock.
     Long roomId = bookingRepository.findRoomIdById(id).orElseThrow(ServiceErrors::notFound);
     roomService.lock(roomId);

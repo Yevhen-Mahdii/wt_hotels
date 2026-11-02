@@ -19,7 +19,6 @@ import ua.edu.hotels.security.HotelToken;
 @Transactional(readOnly = true)
 public class HotelService {
   private final HotelRepository hotelRepository;
-  private final AccessPolicy accessPolicy;
 
   public Hotel get(Long id) {
     if (id == null) throw ServiceErrors.notFound();
@@ -34,7 +33,7 @@ public class HotelService {
 
   @Transactional
   public Hotel save(HotelToken actor, Long id, HotelInput input) {
-    accessPolicy.requireRole(actor, Role.ADMIN);
+    actor.requireRole(Role.ADMIN);
     Hotel hotel = id == null ? new Hotel() : get(id);
     hotel.setName(input.name().trim());
     hotel.setAddress(input.address().trim());

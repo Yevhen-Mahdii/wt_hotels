@@ -27,7 +27,7 @@ class BookingServiceTest {
   void setup() {
     bookingService =
         new BookingService(
-            bookingRepository, roomService, new AccessPolicy(), new DateRangePolicy(CLOCK));
+            bookingRepository, roomService, new DateRangePolicy(CLOCK));
   }
 
   BookingInput input() {
