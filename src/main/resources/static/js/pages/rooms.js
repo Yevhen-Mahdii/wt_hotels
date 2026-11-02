@@ -13,7 +13,7 @@ export async function renderRooms(main, context) {
     ) +
     (state.rooms.length
       ? '<div class="grid">' +
-        state.rooms.map((r) => roomCard(r)).join("") +
+        state.rooms.map((r) => roomCard(r, false, state.bookings)).join("") +
         "</div>"
       : empty("Додайте номер, зазначте кількість ліжок, оснащення та ціну."));
   document.querySelector("#add-room").onclick = () =>
