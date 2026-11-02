@@ -7,11 +7,13 @@ export class ApiError extends Error {
   }
 }
 async function request(path, method = "GET", body) {
+  // Public bootstrap/login calls must work even when storage contains an expired or old-key JWT.
+  const authenticated = !path.startsWith("/auth/") && path !== "/catalog";
   const response = await fetch("/api" + path, {
     method,
     headers: {
       ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
-      ...(session.token ? { Authorization: "Bearer " + session.token } : {}),
+      ...(authenticated && session.token ? { Authorization: "Bearer " + session.token } : {}),
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
