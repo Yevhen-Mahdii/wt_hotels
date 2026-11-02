@@ -4,17 +4,85 @@
 
 | Діаграма | Рівень | Що пояснює | Відповідний код |
 | --- | --- | --- | --- |
-| [Архітектура](architecture.puml) | Технічний | Браузер, один контейнер, Spring Security, сервіси, H2 та папка даних | `SecurityConfig`, `compose.yaml` |
-| [Модель предметної області](domain.puml) | Логічний | Ролі, користувачі, готелі, номери, бронювання, проживання й дохід; кратності зв’язків | `data/entity`, V1 |
-| [Початкове налаштування](setup-flow.puml) | Процес | Синхронізація ролей, захист повторного setup, створення мережі й номерів | `HotelsApplication`, `AuthService`, `UserService` |
-| [Вхід і доступ](authentication-sequence.puml) | Технічний | JWT → HotelToken, поточна роль із БД, 401 і 403 | `JwtService`, `HotelTokenConverter`, `HotelToken` |
-| [Пошук і бронювання](booking-sequence.puml) | Технічний | Точні / більші номери, повторна перевірка перетинів під блокуванням, commit / rollback | `BookingService`, `RoomRepository` |
-| [Стани бронювання](booking-lifecycle.puml) | Логічний | Створення, зміна дат, скасування, заселення та завершення | `BookingService`, `StayService` |
-| [Стани номера](room-lifecycle.puml) | Логічний | FREE → OCCUPIED → CLEANING → FREE, окремо від бронювань | `StayService` |
-| [Заселення](checkin-flow.puml) | Процес | З бронюванням або без нього, власний готель, готовність номера, фіксація ціни | `StayService.checkIn` |
-| [Виселення й клінінг](checkout-flow.puml) | Процес | Межа 12:00, мінімум одна ніч, атомарний запис доходу, завершення клінінгу | `StayService`, `StayCalculator` |
-| [Календар](calendar-flow.puml) | Процес | Поєднання станів і видима накладка, межі показу клінінгу й відкритого проживання | `CalendarService`, `CalendarDayFactory` |
-| [Звіт про дохід](revenue-flow.puml) | Процес | Рольовий доступ, фільтр готелю й періоду, підсумок за фактичним виселенням | `RevenueService` |
+| [Архітектура](svg/architecture.svg) | Технічний | Браузер, один контейнер, Spring Security, сервіси, H2 та папка даних | `SecurityConfig`, `compose.yaml` |
+| [Модель предметної області](svg/domain.svg) | Логічний | Ролі, користувачі, готелі, номери, бронювання, проживання й дохід; кратності зв’язків | `data/entity`, V1 |
+| [Початкове налаштування](svg/setup-flow.svg) | Процес | Синхронізація ролей, захист повторного setup, створення мережі й номерів | `HotelsApplication`, `AuthService`, `UserService` |
+| [Вхід і доступ](svg/authentication-sequence.svg) | Технічний | JWT → HotelToken, поточна роль із БД, 401 і 403 | `JwtService`, `HotelTokenConverter`, `HotelToken` |
+| [Пошук і бронювання](svg/booking-sequence.svg) | Технічний | Точні / більші номери, повторна перевірка перетинів під блокуванням, commit / rollback | `BookingService`, `RoomRepository` |
+| [Стани бронювання](svg/booking-lifecycle.svg) | Логічний | Створення, зміна дат, скасування, заселення та завершення | `BookingService`, `StayService` |
+| [Стани номера](svg/room-lifecycle.svg) | Логічний | FREE → OCCUPIED → CLEANING → FREE, окремо від бронювань | `StayService` |
+| [Заселення](svg/checkin-flow.svg) | Процес | З бронюванням або без нього, власний готель, готовність номера, фіксація ціни | `StayService.checkIn` |
+| [Виселення й клінінг](svg/checkout-flow.svg) | Процес | Межа 12:00, мінімум одна ніч, атомарний запис доходу, завершення клінінгу | `StayService`, `StayCalculator` |
+| [Календар](svg/calendar-flow.svg) | Процес | Поєднання станів і видима накладка, межі показу клінінгу й відкритого проживання | `CalendarService`, `CalendarDayFactory` |
+| [Звіт про дохід](svg/revenue-flow.svg) | Процес | Рольовий доступ, фільтр готелю й періоду, підсумок за фактичним виселенням | `RevenueService` |
+
+## Діаграми
+
+### Архітектура
+
+![Архітектура](svg/architecture.svg)
+
+[PlantUML](architecture.puml)
+
+### Модель предметної області
+
+![Модель предметної області](svg/domain.svg)
+
+[PlantUML](domain.puml)
+
+### Початкове налаштування
+
+![Початкове налаштування](svg/setup-flow.svg)
+
+[PlantUML](setup-flow.puml)
+
+### Вхід і доступ
+
+![Вхід і доступ](svg/authentication-sequence.svg)
+
+[PlantUML](authentication-sequence.puml)
+
+### Пошук і бронювання
+
+![Пошук і бронювання](svg/booking-sequence.svg)
+
+[PlantUML](booking-sequence.puml)
+
+### Стани бронювання
+
+![Стани бронювання](svg/booking-lifecycle.svg)
+
+[PlantUML](booking-lifecycle.puml)
+
+### Стани номера
+
+![Стани номера](svg/room-lifecycle.svg)
+
+[PlantUML](room-lifecycle.puml)
+
+### Заселення
+
+![Заселення](svg/checkin-flow.svg)
+
+[PlantUML](checkin-flow.puml)
+
+### Виселення й клінінг
+
+![Виселення й клінінг](svg/checkout-flow.svg)
+
+[PlantUML](checkout-flow.puml)
+
+### Календар
+
+![Календар](svg/calendar-flow.svg)
+
+[PlantUML](calendar-flow.puml)
+
+### Звіт про дохід
+
+![Звіт про дохід](svg/revenue-flow.svg)
+
+[PlantUML](revenue-flow.puml)
 
 ## Покриття важливих сценаріїв
 
@@ -32,10 +100,18 @@
 
 ## Перегляд і експорт
 
-Відкрийте `.puml` у редакторі з підтримкою PlantUML або використайте локальний PlantUML JAR. Приклад запуску з кореня проєкту, якщо JAR розміщений у `tools/plantuml.jar`:
+SVG у папці `docs/svg` збережені в репозиторії та відображаються вище без додаткових плагінів GitHub. Після зміни `.puml` повторно згенеруйте SVG та закомітьте обидва файли.
+
+Для генерації використано PlantUML 1.2026.9. Відтворення через Docker із кореня проєкту в PowerShell (образ зафіксований за digest):
+
+```powershell
+docker run --rm --network none --mount "type=bind,source=$PWD/docs,target=/diagrams" plantuml/plantuml@sha256:9b5071ab56a4192aac458ab4b0d42261c22c8109695894ae5be6013c3be6cac1 -charset UTF-8 -tsvg -failfast2 -o svg "/diagrams/*.puml"
+```
+
+Або відкрийте `.puml` у редакторі з підтримкою PlantUML чи використайте локальний PlantUML JAR. Приклад запуску з кореня проєкту, якщо JAR розміщений у `tools/plantuml.jar`:
 
 ```sh
-java -jar tools/plantuml.jar -charset UTF-8 -tsvg -o ../target/diagrams "docs/*.puml"
+java -jar tools/plantuml.jar -charset UTF-8 -tsvg -failfast2 -o svg "docs/*.puml"
 java -jar tools/plantuml.jar -charset UTF-8 -tpng -o ../target/diagrams "docs/*.puml"
 ```
 

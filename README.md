@@ -143,6 +143,6 @@ sh mvnw spring-boot:run
 
 - [Технічний опис, структура проєкту та бізнес-правила](docs/DEVELOPMENT.md).
 - [Каталог діаграм і покриття сценаріїв](docs/DIAGRAMS.md).
-- [Логічна модель](docs/domain.puml), [архітектура](docs/architecture.puml), [бронювання](docs/booking-sequence.puml).
+- [Логічна модель](docs/svg/domain.svg), [архітектура](docs/svg/architecture.svg), [бронювання](docs/svg/booking-sequence.svg).
 
 Діаграми зберігаються як код **PlantUML (`.puml`)** та охоплюють архітектуру, модель предметної області й основні сценарії роботи.
