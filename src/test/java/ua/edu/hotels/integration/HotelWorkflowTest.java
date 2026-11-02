@@ -159,6 +159,27 @@ class HotelWorkflowTest {
   }
 
   @Test
+  void initialSchemaHasNoCheckConstraints() {
+    assertThat(jdbcTemplate.queryForObject(
+        "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS "
+            + "WHERE CONSTRAINT_SCHEMA = 'PUBLIC' AND CONSTRAINT_TYPE = 'CHECK'",
+        Integer.class)).isZero();
+  }
+
+  @Test
+  void applicationRejectsInvalidValuesWithoutDatabaseChecks() throws Exception {
+    postAs(manager, "/rooms", roomBody(hotel, "bad-beds", 0, "100"), 400);
+    postAs(manager, "/rooms", roomBody(hotel, "bad-price", 2, "-1"), 400);
+    postAs(operator, "/bookings", bookingBody(room, "2026-11-05", "2026-11-05"), 400);
+    postAs(admin, "/users", Map.of(
+        "email", "invalid-manager@example.test", "password", "correct-password",
+        "role", "MANAGER"), 404);
+    postAs(admin, "/users", Map.of(
+        "email", "invalid-admin@example.test", "password", "correct-password",
+        "role", "ADMIN", "hotelId", hotel), 400);
+  }
+
+  @Test
   void firstSetupIsOneTimeAndJwtIsRequired() throws Exception {
     anonymous(
         "/auth/setup", Map.of("email", "second@example.test", "password", "correct-password"), 409);

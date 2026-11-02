@@ -1,4 +1,4 @@
-package ua.edu.hotels.service;
+package ua.edu.hotels.security;
 
 import static org.assertj.core.api.Assertions.*;
 import static ua.edu.hotels.support.Fixtures.user;
@@ -10,40 +10,39 @@ import org.springframework.web.server.ResponseStatusException;
 import ua.edu.hotels.data.enums.Role;
 
 /** Checks role restrictions and prevents managers from accessing another hotel. */
-class AccessPolicyTest {
-  private final AccessPolicy accessPolicy = new AccessPolicy();
+class HotelTokenAccessTest {
 
   @ParameterizedTest
   @EnumSource(Role.class)
   void acceptsMatchingRole(Role role) {
-    assertThatCode(() -> accessPolicy.requireRole(user(role), role)).doesNotThrowAnyException();
+    assertThatCode(() -> user(role).requireRole(role)).doesNotThrowAnyException();
   }
 
   @Test
   void rejectsWrongRole() {
-    assertThatThrownBy(() -> accessPolicy.requireRole(user(Role.MANAGER), Role.ADMINISTRATOR))
+    assertThatThrownBy(() -> user(Role.MANAGER).requireRole(Role.ADMINISTRATOR))
         .isInstanceOf(ResponseStatusException.class);
   }
 
   @Test
   void managerIsAlwaysScopedToOwnHotel() {
-    assertThat(accessPolicy.hotelFilter(user(Role.MANAGER), null)).isEqualTo(10L);
+    assertThat(user(Role.MANAGER).hotelFilter(null)).isEqualTo(10L);
   }
 
   @Test
   void managerCannotSelectAnotherHotel() {
-    assertThatThrownBy(() -> accessPolicy.hotelFilter(user(Role.MANAGER), 11L))
+    assertThatThrownBy(() -> user(Role.MANAGER).hotelFilter(11L))
         .isInstanceOf(ResponseStatusException.class);
   }
 
   @Test
   void administratorCanSelectWholeNetwork() {
-    assertThat(accessPolicy.hotelFilter(user(Role.ADMINISTRATOR), null)).isNull();
+    assertThat(user(Role.ADMINISTRATOR).hotelFilter(null)).isNull();
   }
 
   @Test
   void systemAdminCannotReadRevenue() {
-    assertThatThrownBy(() -> accessPolicy.requireRevenueAccess(user(Role.ADMIN)))
+    assertThatThrownBy(() -> user(Role.ADMIN).requireRevenueAccess())
         .isInstanceOf(ResponseStatusException.class);
   }
 }

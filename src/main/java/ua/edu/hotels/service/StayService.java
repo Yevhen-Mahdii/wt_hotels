@@ -25,15 +25,14 @@ public class StayService {
   private final BookingRepository bookingRepository;
   private final BookingService bookingService;
   private final RevenueRepository revenueRepository;
-  private final AccessPolicy accessPolicy;
   private final StayCalculator stayCalculator;
   private final Clock clock;
 
   @Transactional
   public Stay checkIn(HotelToken actor, Long roomId, Long bookingId) {
-    accessPolicy.requireRole(actor, Role.MANAGER);
+    actor.requireRole(Role.MANAGER);
     Room room = roomService.lock(roomId);
-    accessPolicy.requireHotelAccess(actor, room.getHotelId());
+    actor.requireHotelAccess(room.getHotelId());
     if (room.getState() != RoomState.FREE)
       throw new ResponseStatusException(CONFLICT, "Спочатку звільніть номер і завершіть клінінг");
     LocalDate today = LocalDate.now(clock);
@@ -62,9 +61,9 @@ public class StayService {
 
   @Transactional
   public Revenue checkOut(HotelToken actor, Long roomId) {
-    accessPolicy.requireRole(actor, Role.MANAGER);
+    actor.requireRole(Role.MANAGER);
     Room room = roomService.lock(roomId);
-    accessPolicy.requireHotelAccess(actor, room.getHotelId());
+    actor.requireHotelAccess(room.getHotelId());
     if (room.getState() != RoomState.OCCUPIED)
       throw new ResponseStatusException(CONFLICT, "Номер не зайнятий");
     Stay stay =
@@ -90,9 +89,9 @@ public class StayService {
 
   @Transactional
   public Room completeCleaning(HotelToken actor, Long roomId) {
-    accessPolicy.requireRole(actor, Role.MANAGER);
+    actor.requireRole(Role.MANAGER);
     Room room = roomService.lock(roomId);
-    accessPolicy.requireHotelAccess(actor, room.getHotelId());
+    actor.requireHotelAccess(room.getHotelId());
     if (room.getState() != RoomState.CLEANING)
       throw new ResponseStatusException(CONFLICT, "Номер не потребує клінінгу");
     room.setState(RoomState.FREE);

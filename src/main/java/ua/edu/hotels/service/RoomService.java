@@ -21,10 +21,9 @@ import ua.edu.hotels.security.HotelToken;
 public class RoomService {
   private final RoomRepository roomRepository;
   private final HotelService hotelService;
-  private final AccessPolicy accessPolicy;
 
   public List<Room> list(HotelToken actor, Long hotelId) {
-    Long filter = accessPolicy.hotelFilter(actor, hotelId);
+    Long filter = actor.hotelFilter(hotelId);
     return filter == null
         ? roomRepository.findAllByOrderByHotelIdAscNumberAsc()
         : roomRepository.findByHotelIdOrderByNumberAsc(filter);
@@ -37,12 +36,12 @@ public class RoomService {
 
   @Transactional
   public Room save(HotelToken actor, Long id, RoomInput input) {
-    accessPolicy.requireRole(actor, Role.MANAGER);
-    accessPolicy.requireHotelAccess(actor, input.hotelId());
+    actor.requireRole(Role.MANAGER);
+    actor.requireHotelAccess(input.hotelId());
     hotelService.get(input.hotelId());
     Room room = id == null ? new Room() : lock(id);
     if (id != null) {
-      accessPolicy.requireHotelAccess(actor, room.getHotelId());
+      actor.requireHotelAccess(room.getHotelId());
       if (!room.getHotelId().equals(input.hotelId()))
         throw new ResponseStatusException(BAD_REQUEST, "Не можна переносити номер між готелями");
     }
