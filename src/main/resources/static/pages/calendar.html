@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#355b43" />
+    <title>Розклад номерів — Тихий двір</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <!-- Each page loads only its controller, which initializes the shared session and UI. -->
+    <script type="module" src="/js/pages/calendar.js"></script>
+  </head>
+  <body data-page="calendar">
+    <p id="page-status" class="loading" role="status">
+      Завантажуємо робочий простір…
+    </p>
+    <div class="shell" hidden>
+      <main id="main">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow" data-role-caption></div>
+            <h1>Розклад номерів</h1>
+            <p id="page-description">
+              Бронювання наперед і фактичний стан — поруч.
+            </p>
+          </div>
+        </div>
+        <form id="filters" class="filters">
+          <label>Від<input type="date" name="start" required /></label>
+          <label>До (виїзд)<input type="date" name="end" required /></label>
+
+          <label data-hotel-filter
+            >Готель<select name="hotelId"></select
+          ></label>
+          <button type="submit">Показати</button>
+        </form>
+        <div class="legend" id="legend"></div>
+        <p id="empty" class="empty" hidden>
+          Номерів ще немає. Керуючий може додати їх у своєму готелі.
+        </p>
+        <div
+          class="calendar-scroll"
+          id="calendar"
+          tabindex="0"
+          aria-label="Розклад номерів, прокручуйте горизонтально"
+        >
+          <table class="calendar">
+            <thead>
+              <tr id="calendar-head">
+                <th>Номер / готель</th>
+              </tr>
+            </thead>
+            <tbody id="calendar-body"></tbody>
+          </table>
+        </div>
+        <p class="help">
+          На смартфоні гортайте розклад убік. Помаранчева рамка позначає
+          накладку. Межа доби — 12:00 за Києвом. Майбутній стан «Вільно» означає
+          відсутність бронювання, а не підтвердження прибирання.
+        </p>
+      </main>
+    </div>
+    <div id="notice" role="status" aria-live="polite" hidden></div>
+    <noscript>Для роботи застосунку увімкніть JavaScript.</noscript>
+  </body>
+</html>

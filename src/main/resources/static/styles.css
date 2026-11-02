@@ -156,7 +156,7 @@ small,
   background: var(--white);
   border-bottom: 1px solid var(--line);
 }
-.nav button {
+.nav a {
   white-space: nowrap;
   background: none;
   color: var(--muted);
@@ -164,7 +164,7 @@ small,
   font-size: 13px;
   padding: 9px 13px;
 }
-.nav button.active {
+.nav a.active {
   background: #e4ebdf;
   color: #294c35;
 }
@@ -175,7 +175,7 @@ small,
 main {
   padding: 26px 18px 50px;
   max-width: 1500px;
-  margin: auto;
+  margin: 0 auto;
 }
 .page-head {
   display: flex;
@@ -647,7 +647,7 @@ dialog::backdrop {
     border-bottom: 0;
     gap: 8px;
   }
-  .nav button {
+  .nav a {
     text-align: left;
     font-size: 14px;
   }
@@ -714,4 +714,17 @@ dialog::backdrop {
       transform: none;
     }
   }
+}
+
+/* Hidden pages/templates remain hidden even when their layout uses flex or grid. */
+[hidden] {
+  display: none !important;
+}
+.nav a {
+  display: block;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  text-decoration: none;
+  font-weight: 600;
 }

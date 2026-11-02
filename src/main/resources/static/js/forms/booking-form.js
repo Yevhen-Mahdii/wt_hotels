@@ -1,40 +1,29 @@
-/** Edits reservation dates; the server rechecks availability when saving. */
+/** Fills booking dates and room context; the server rechecks availability on submission. */
 import { rest } from "../core/rest.js";
 import { state, hotelName } from "../core/state.js";
-import { escapeHtml as esc, money, today } from "../core/format.js";
-import { field } from "../ui/components.js";
+import { money, today } from "../core/format.js";
+import { fragment, text, setValues } from "../ui/templates.js";
 import { openForm } from "../ui/modal.js";
-export function bookingForm(b, roomId, onSaved) {
-  roomId = b?.roomId || roomId;
-  const r = state.rooms.find((r) => r.id === roomId);
+export function bookingForm(booking, roomId, onSaved) {
+  roomId = booking?.roomId ?? roomId;
+  const room = state.rooms.find((r) => r.id === roomId);
+  const fields = fragment("booking-form-template");
+  text(
+    fields,
+    "[data-summary]",
+    `${hotelName(room.hotelId)} · ${room.beds} ліжок. Поточна ціна ${money(room.price)}, остаточна фіксується при заселенні.`,
+  );
+  setValues(fields, {
+    startDate: booking?.startDate ?? state.filters.start,
+    endDate: booking?.endDate ?? state.filters.end,
+  });
+  fields.querySelectorAll('input[type="date"]').forEach((input) => {
+    input.min = today();
+  });
   openForm(
-    b ? "Змінити дати" : "Бронювання · № " + r.number,
-    '<p class="form-note">' +
-      esc(hotelName(r.hotelId)) +
-      " · " +
-      r.beds +
-      " ліжок. Поточна ціна " +
-      money(r.price) +
-      ", остаточна фіксується при заселенні.</p>" +
-      field(
-        "Заїзд",
-        "startDate",
-        "date",
-        b?.startDate || state.filters.start,
-        'min="' + today() + '"',
-      ) +
-      field(
-        "Виїзд",
-        "endDate",
-        "date",
-        b?.endDate || state.filters.end,
-        'min="' + today() + '"',
-      ),
-    (data) =>
-      rest.bookings.save(b?.id, {
-        ...data,
-        roomId,
-      }),
+    booking ? "Змінити дати" : "Бронювання · № " + room.number,
+    fields,
+    (data) => rest.bookings.save(booking?.id, { ...data, roomId }),
     onSaved,
   );
 }

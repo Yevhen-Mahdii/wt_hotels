@@ -1,12 +1,4 @@
-/** Escapes dynamic HTML and formats dates and currency for the Ukrainian interface. */
-export const escapeHtml = (value) =>
-  String(value ?? "").replace(
-    /[&<>"']/g,
-    (character) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
-        character
-      ],
-  );
+/** Formats dates and currency; views assign data with textContent rather than HTML strings. */
 export const today = () =>
   new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Kyiv" }).format(
     new Date(),

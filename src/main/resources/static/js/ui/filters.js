@@ -1,34 +1,37 @@
-/** Shares date and hotel filters across views; manager scope is still enforced by the backend. */
+/** Binds static filter fields; the URL preserves selections across reload and back navigation. */
 import { state } from "../core/state.js";
-import { field, hotelSelect } from "./components.js";
+import { fillHotelSelect } from "./components.js";
 import { notify } from "./notifications.js";
-export function filterForm(search = false) {
-  return (
-    '<form id="filters" class="filters">' +
-    field("Від", "start", "date", state.filters.start) +
-    field("До (виїзд)", "end", "date", state.filters.end) +
-    (search
-      ? field("Ліжок", "beds", "number", state.filters.beds, 'min="1" max="20"')
-      : "") +
-    (state.user.role !== "MANAGER"
-      ? hotelSelect(true, state.filters.hotelId)
-      : "") +
-    "<button>" +
-    (search ? "Знайти номери" : "Показати") +
-    "</button></form>"
-  );
-}
-export function bindFilters(container, render) {
-  container.querySelector("#filters").onsubmit = async (event) => {
+export function bindFilters(container, refresh) {
+  const form = container.querySelector("#filters");
+  form.elements.start.value = state.filters.start;
+  form.elements.end.value = state.filters.end;
+  if (form.elements.beds) form.elements.beds.value = state.filters.beds;
+  fillHotelSelect(form.elements.hotelId, state.filters.hotelId);
+  if (state.user.role === "MANAGER") {
+    form.querySelector("[data-hotel-filter]").hidden = true;
+    form.elements.hotelId.disabled = true;
+    state.filters.hotelId = "";
+  }
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     state.filters = {
       ...state.filters,
-      ...Object.fromEntries(new FormData(event.target)),
+      ...Object.fromEntries(new FormData(form)),
     };
+    history.replaceState(
+      null,
+      "",
+      location.pathname + "?" + new URLSearchParams(state.filters),
+    );
+    const button = form.querySelector("button");
+    button.disabled = true;
     try {
-      await render();
+      await refresh();
     } catch (error) {
       notify(error.message, true);
+    } finally {
+      button.disabled = false;
     }
-  };
+  });
 }

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#355b43" />
+    <title>Користувачі — Тихий двір</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <!-- Each page loads only its controller, which initializes the shared session and UI. -->
+    <script type="module" src="/js/pages/users.js"></script>
+  </head>
+  <body data-page="users">
+    <p id="page-status" class="loading" role="status">
+      Завантажуємо робочий простір…
+    </p>
+    <div class="shell" hidden>
+      <main id="main">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow" data-role-caption></div>
+            <h1>Користувачі</h1>
+            <p id="page-description">Доступи до мережі та окремих готелів.</p>
+          </div>
+          <button id="add-user">+ Користувач</button>
+        </div>
+        <div id="items" class="grid"></div>
+      </main>
+    </div>
+    <div id="notice" role="status" aria-live="polite" hidden></div>
+    <noscript>Для роботи застосунку увімкніть JavaScript.</noscript>
+  </body>
+</html>

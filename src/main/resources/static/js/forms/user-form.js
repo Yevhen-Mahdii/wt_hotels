@@ -1,35 +1,20 @@
-/** Builds role choices from server metadata; hotel assignment is validated again on the server. */
+/** Populates role and hotel choices from shared data; the server enforces assignment rules. */
 import { rest } from "../core/rest.js";
 import { roleOptions } from "../core/catalog.js";
-import { escapeHtml as esc } from "../core/format.js";
-import { field, hotelSelect } from "../ui/components.js";
+import { fragment } from "../ui/templates.js";
+import { fillHotelSelect } from "../ui/components.js";
 import { openForm } from "../ui/modal.js";
 export function userForm(onSaved) {
-  const roles = roleOptions()
-    .map(
-      (role) =>
-        '<option value="' +
-        esc(role.name) +
-        '">' +
-        esc(role.label) +
-        "</option>",
-    )
-    .join("");
+  const fields = fragment("user-form-template");
+  fields
+    .querySelector('[name="role"]')
+    .replaceChildren(
+      ...roleOptions().map((role) => new Option(role.label, role.name)),
+    );
+  fillHotelSelect(fields.querySelector('[name="hotelId"]'));
   openForm(
     "Новий користувач",
-    field("Email", "email", "email", "", 'maxlength="180" autocomplete="off"') +
-      field(
-        "Пароль",
-        "password",
-        "password",
-        "",
-        'minlength="10" maxlength="72" autocomplete="new-password"',
-      ) +
-      '<label>Роль<select name="role">' +
-      roles +
-      "</select></label>" +
-      hotelSelect(true) +
-      '<p class="form-note">Для Керуючого оберіть один готель. Для інших ролей залиште «Усі готелі».</p>',
+    fields,
     (data) =>
       rest.users.create({
         ...data,

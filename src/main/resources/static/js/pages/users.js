@@ -1,31 +1,28 @@
-/** Displays staff access and opens account creation with server-provided role labels. */
+/** Loads staff accounts and fills user-card templates with role and hotel labels. */
+import { startPage } from "../core/page.js";
 import { rest } from "../core/rest.js";
 import { hotelName } from "../core/state.js";
 import { roleLabel } from "../core/catalog.js";
-import { escapeHtml as esc } from "../core/format.js";
-import { heading } from "../ui/components.js";
+import { element, text } from "../ui/templates.js";
 import { userForm } from "../forms/user-form.js";
-export async function renderUsers(main, context) {
+async function render(main) {
   const users = await rest.users.list();
-  main.innerHTML =
-    heading(
-      "Користувачі",
-      "Доступи до мережі та окремих готелів.",
-      '<button id="add-user">+ Користувач</button>',
-    ) +
-    '<div class="grid">' +
-    users
-      .map(
-        (u) =>
-          '<article class="card"><div class="eyebrow">' +
-          esc(roleLabel(u.role)) +
-          "</div><h3>" +
-          esc(u.email) +
-          '</h3><p class="muted">' +
-          (u.hotelId ? esc(hotelName(u.hotelId)) : "Уся мережа") +
-          "</p></article>",
-      )
-      .join("") +
-    "</div>";
-  document.querySelector("#add-user").onclick = () => userForm(context.refresh);
+  main.querySelector("#items").replaceChildren(
+    ...users.map((user) => {
+      const card = element("user-card-template");
+      text(card, "[data-role]", roleLabel(user.role));
+      text(card, "[data-email]", user.email);
+      text(
+        card,
+        "[data-hotel]",
+        user.hotelId ? hotelName(user.hotelId) : "Уся мережа",
+      );
+      return card;
+    }),
+  );
 }
+startPage(render, (main, { refresh }) => {
+  main
+    .querySelector("#add-user")
+    .addEventListener("click", () => userForm(refresh));
+});

@@ -1,41 +1,35 @@
-/** Renders network hotel maintenance using the shared hotel and room snapshot. */
+/** Populates hotel cards and opens editing forms; the page structure belongs to hotels.html. */
+import { startPage } from "../core/page.js";
 import { state } from "../core/state.js";
-import { escapeHtml as esc } from "../core/format.js";
-import { heading, empty } from "../ui/components.js";
+import { element, text } from "../ui/templates.js";
 import { hotelForm } from "../forms/hotel-form.js";
-export async function renderHotels(main, context) {
-  main.innerHTML =
-    heading(
-      "Готелі мережі",
-      "Створюйте готелі та призначайте Керуючих у розділі користувачів.",
-      '<button id="add-hotel">+ Готель</button>',
-    ) +
-    (state.hotels.length
-      ? '<div class="grid">' +
-        state.hotels
-          .map(
-            (h) =>
-              '<article class="card"><div class="eyebrow">ГОТЕЛЬ</div><h2>' +
-              esc(h.name) +
-              '</h2><p class="muted">' +
-              esc(h.address) +
-              "</p><small>" +
-              state.rooms.filter((r) => r.hotelId === h.id).length +
-              ' номерів</small><div class="actions"><button class="secondary" data-hotel="' +
-              h.id +
-              '">Редагувати</button></div></article>',
-          )
-          .join("") +
-        "</div>"
-      : empty("Почніть із першого готелю мережі."));
-  document.querySelector("#add-hotel").onclick = () =>
-    hotelForm(undefined, context.refresh);
-  document.querySelectorAll("[data-hotel]").forEach(
-    (b) =>
-      (b.onclick = () =>
-        hotelForm(
-          state.hotels.find((h) => h.id === +b.dataset.hotel),
-          context.refresh,
-        )),
+function render(main) {
+  main.querySelector("#items").replaceChildren(
+    ...state.hotels.map((hotel) => {
+      const card = element("hotel-card-template");
+      text(card, "[data-name]", hotel.name);
+      text(card, "[data-address]", hotel.address);
+      text(
+        card,
+        "[data-count]",
+        state.rooms.filter((r) => r.hotelId === hotel.id).length + " номерів",
+      );
+      card.querySelector("[data-edit]").dataset.hotel = hotel.id;
+      return card;
+    }),
   );
+  main.querySelector("#empty").hidden = state.hotels.length > 0;
 }
+startPage(render, (main, { refresh }) => {
+  main
+    .querySelector("#add-hotel")
+    .addEventListener("click", () => hotelForm(undefined, refresh));
+  main.querySelector("#items").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-hotel]");
+    if (button)
+      hotelForm(
+        state.hotels.find((h) => h.id === +button.dataset.hotel),
+        refresh,
+      );
+  });
+});

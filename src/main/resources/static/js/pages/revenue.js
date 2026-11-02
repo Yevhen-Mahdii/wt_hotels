@@ -1,46 +1,25 @@
-/** Displays checkout-recorded gross revenue, not payments, forecasts or net profit. */
+/** Presents checkout-recorded revenue and totals using the static report table. */
+import { startPage } from "../core/page.js";
 import { state, hotelName } from "../core/state.js";
 import { rest } from "../core/rest.js";
-import { escapeHtml as esc, money } from "../core/format.js";
-import { heading, empty } from "../ui/components.js";
-import { filterForm, bindFilters } from "../ui/filters.js";
-export async function renderRevenue(main, context) {
-  main.innerHTML =
-    heading(
-      "Валовий дохід",
-      "Лише завершені проживання. Без обліку оплат і витрат.",
-    ) +
-    filterForm() +
-    '<div id="revenue"></div>';
-  bindFilters(main, () => renderRevenue(main, context));
+import { money, timestampLabel } from "../core/format.js";
+import { element, text } from "../ui/templates.js";
+import { bindFilters } from "../ui/filters.js";
+async function render(main) {
   const data = await rest.revenue(state.filters);
-  document.querySelector("#revenue").innerHTML =
-    '<section class="stat"><div class="eyebrow">За вибраний період</div><div class="amount">' +
-    money(data.total) +
-    "</div><p>" +
-    data.items.length +
-    " завершених проживань · ціна фіксується при заселенні</p></section>" +
-    (data.items.length
-      ? '<div class="card table-wrap"><table class="data-table"><thead><tr><th>Готель</th><th>Виселення</th><th>Ночей</th><th>Дохід</th></tr></thead><tbody>' +
-        data.items
-          .map(
-            (r) =>
-              "<tr><td>" +
-              esc(hotelName(r.hotelId)) +
-              "</td><td>" +
-              esc(
-                new Date(r.recordedAt).toLocaleString("uk-UA", {
-                  timeZone: "Europe/Kyiv",
-                }),
-              ) +
-              "</td><td>" +
-              r.nights +
-              "</td><td>" +
-              money(r.amount) +
-              "</td></tr>",
-          )
-          .join("") +
-        "</tbody></table></div>"
-      : empty("За цей період завершених проживань немає.")) +
-    '<p class="help">Період: від 12:00 початкової дати до 12:00 кінцевої (не включно). Дохід записується при виселенні. Мінімальне проживання для розрахунку — одна ніч.</p>';
+  text(main, "#total", money(data.total));
+  text(main, "#stay-count", data.items.length);
+  main.querySelector("#items").replaceChildren(
+    ...data.items.map((item) => {
+      const row = element("revenue-row-template");
+      text(row, "[data-hotel]", hotelName(item.hotelId));
+      text(row, "[data-date]", timestampLabel(item.recordedAt));
+      text(row, "[data-nights]", item.nights);
+      text(row, "[data-amount]", money(item.amount));
+      return row;
+    }),
+  );
+  main.querySelector("#revenue-table").hidden = data.items.length === 0;
+  main.querySelector("#empty").hidden = data.items.length > 0;
 }
+startPage(render, (main, { refresh }) => bindFilters(main, refresh));
