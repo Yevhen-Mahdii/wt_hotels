@@ -1,0 +1,33 @@
+@startuml
+title Початкове налаштування мережі
+skinparam backgroundColor #FAF9F3
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam ArrowColor #70553F
+skinparam classBackgroundColor #E4EDDC
+skinparam activityBackgroundColor #E4EDDC
+skinparam sequenceParticipantBackgroundColor #E4EDDC
+start
+:Запустити Spring Boot;
+:Flyway створює схему за потреби;\nHibernate перевіряє відповідність;
+:HotelsApplication.setup() після старту\nсинхронізує ролі з enum без дублювання;
+if (Користувачів немає?) then (так)
+  :Показати форму створення Адміна;
+  :Прийняти email і пароль;
+  :У транзакції заблокувати setup_lock;
+  if (Користувачів усе ще немає?) then (так)
+    :Нормалізувати email, хешувати пароль;\nстворити Адміна й видати JWT;
+  else (ні)
+    :Відхилити повторне налаштування (409);
+    stop
+  endif
+else (ні)
+  :Показати форму входу;
+endif
+:Адмін створює готелі та користувачів;
+:Для кожного Керуючого\nпризначити один існуючий готель;
+:Керуючий додає номери,\nціни, кількість ліжок та оснащення;
+:Мережа готова до бронювання;
+stop
+@enduml

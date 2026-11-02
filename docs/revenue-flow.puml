@@ -1,0 +1,32 @@
+@startuml
+title Перегляд валового доходу
+skinparam backgroundColor #FAF9F3
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam ArrowColor #70553F
+skinparam classBackgroundColor #E4EDDC
+skinparam activityBackgroundColor #E4EDDC
+skinparam sequenceParticipantBackgroundColor #E4EDDC
+start
+:Обрати період і, за потреби, готель;
+if (Роль ADMIN?) then (так)
+  :Відхилити доступ (403);
+  stop
+endif
+if (Роль MANAGER?) then (так)
+  :Дозволити лише призначений готель;\nчужий готель → 403;
+else (ADMINISTRATOR)
+  :Використати обраний готель\nабо всю мережу;
+endif
+:Перевірити період (1–366 днів);
+:Обчислити межі:\n[початкова дата 12:00, кінцева дата 12:00)\nза Europe/Kyiv;
+:Вибрати записи доходу\nза часом фактичного виселення;
+:Підсумувати суми та повернути деталізацію;
+stop
+note right
+ Лише завершені проживання.
+ Немає оплат, витрат і прогнозованого доходу.
+ Дохід не розподіляється між ночами звітного періоду.
+end note
+@enduml

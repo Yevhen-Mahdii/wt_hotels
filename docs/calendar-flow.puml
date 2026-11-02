@@ -1,0 +1,40 @@
+@startuml
+title Формування календаря і накладки станів
+skinparam backgroundColor #FAF9F3
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam ArrowColor #70553F
+skinparam classBackgroundColor #E4EDDC
+skinparam activityBackgroundColor #E4EDDC
+skinparam sequenceParticipantBackgroundColor #E4EDDC
+start
+:Перевірити період (1–366 днів);\nобмежити Керуючого своїм готелем;
+:Завантажити номери, RESERVED-бронювання\nі проживання для періоду;
+:Для кожного номера і дати\nпочати з порожнього списку станів;
+if (Дата у [заїзд, виїзд) бронювання?) then (так)
+  :Додати RESERVED та id бронювання;
+endif
+if (Фактичне проживання охоплює дату?) then (так)
+  :Додати OCCUPIED;
+endif
+if (Це сьогодні і номер CLEANING?) then (так)
+  :Додати CLEANING;
+endif
+if (Список порожній?) then (так)
+  :Додати FREE;
+endif
+if (Станів більше одного?) then (так)
+  :Позначити накладку;\nпоказати всі стани разом;
+else (ні)
+  :Показати один стан;
+endif
+:Повернути рядки календаря;
+stop
+note right
+ Відкрите проживання показується до сьогодні включно,
+ без прогнозу його майбутнього завершення.
+ Клінінг показується тільки на сьогодні.
+ Майбутній FREE не гарантує завершеного прибирання.
+end note
+@enduml

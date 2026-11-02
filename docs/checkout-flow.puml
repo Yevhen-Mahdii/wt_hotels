@@ -1,0 +1,35 @@
+@startuml
+title Виселення, дохід і клінінг
+skinparam backgroundColor #FAF9F3
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam ArrowColor #70553F
+skinparam classBackgroundColor #E4EDDC
+skinparam activityBackgroundColor #E4EDDC
+skinparam sequenceParticipantBackgroundColor #E4EDDC
+start
+:Керуючий підтверджує виселення;
+:Почати транзакцію; перевірити роль;\nзаблокувати номер і перевірити готель;
+if (Номер OCCUPIED\nі є відкрите проживання?) then (так)
+else (ні)
+  :Відхилити операцію;\nвідкотити транзакцію;
+  stop
+endif
+:Зафіксувати фактичний час виселення;
+:Перевести час заселення й виселення\nв облікові дати Europe/Kyiv;
+note right
+ До 12:00 — попередня облікова дата.
+ Від 12:00 — поточна облікова дата.
+end note
+:Ночі = max(1, різниця облікових дат);\nДохід = ціна при заселенні × ночі;
+:Створити єдиний запис доходу для проживання;\nчас доходу = час виселення;
+if (Є пов’язане бронювання?) then (так)
+  :Перевести бронювання у COMPLETED;
+endif
+:Перевести номер у CLEANING;\nзафіксувати всі зміни разом;
+:Після прибирання Керуючий\nпідтверджує завершення клінінгу;
+:Окрема транзакція: перевірити доступ,\nзаблокувати номер, вимагати CLEANING;
+:Перевести номер у FREE;
+stop
+@enduml

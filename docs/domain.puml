@@ -1,0 +1,67 @@
+@startuml
+title Логічна модель предметної області
+skinparam backgroundColor #FAF9F3
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam ArrowColor #70553F
+skinparam classBackgroundColor #E4EDDC
+skinparam activityBackgroundColor #E4EDDC
+skinparam sequenceParticipantBackgroundColor #E4EDDC
+hide methods
+hide circle
+class "Роль" as Role {
+  Стабільний код
+  Назва та підпис
+}
+class "Користувач" as User {
+  Email
+  Хеш пароля
+}
+class "Готель" as Hotel {
+  Назва
+  Адреса
+}
+class "Номер" as Room {
+  Номер / назва в готелі
+  Кількість ліжок
+  Поточна ціна за ніч
+  Фізичний стан
+  Набір оснащення
+}
+class "Бронювання" as Booking {
+  Дата заїзду
+  Дата виїзду — не включно
+  Статус бронювання
+}
+class "Проживання" as Stay {
+  Фактичний час заселення
+  Фактичний час виселення — необов’язковий
+  Ціна за ніч, зафіксована при заселенні
+}
+class "Запис валового доходу" as Revenue {
+  Час виселення
+  Кількість облікових ночей
+  Сума
+}
+Role "1" -- "0..*" User : призначена
+Hotel "0..1" -- "0..*" User : місце роботи
+Hotel "1" -- "0..*" Room
+Room "1" -- "0..*" Booking
+Room "1" -- "0..*" Stay
+Booking "0..1" -- "0..1" Stay : підстава
+Stay "1" -- "0..1" Revenue : результат виселення
+Hotel "1" -- "0..*" Revenue : дохід готелю
+note right of User
+ Один користувач має одну роль.
+ Керуючий обов’язково має один готель;
+ інші ролі не прив’язані до готелю.
+ Готель може мати кількох Керуючих.
+end note
+note bottom of Room
+ Оснащення: чайник, кондиціонер,
+ телевізор, холодильник.
+ Бронювання не змінює фізичний стан номера.
+ Дані гостей не зберігаються.
+end note
+@enduml
