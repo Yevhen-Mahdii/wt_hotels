@@ -1,0 +1,62 @@
+<!-- Field names match API payload keys. Form modules fill these templates and handle submission. -->
+<template id="hotel-form-template"
+  ><label>Назва<input name="name" maxlength="120" required /></label
+  ><label>Адреса<input name="address" maxlength="250" required /></label
+></template>
+<template id="room-form-template"
+  ><label>Номер / назва<input name="number" maxlength="30" required /></label
+  ><label
+    >Кількість ліжок<input
+      name="beds"
+      type="number"
+      min="1"
+      max="20"
+      required /></label
+  ><label
+    >Ціна за ніч, ₴<input
+      name="price"
+      type="number"
+      min="0"
+      max="99999999.99"
+      step="0.01"
+      required
+  /></label>
+  <div class="checks"></div
+></template>
+<template id="equipment-option-template"
+  ><label><input type="checkbox" name="equipment" /><span></span></label
+></template>
+<template id="user-form-template"
+  ><label
+    >Email<input
+      name="email"
+      type="email"
+      maxlength="180"
+      autocomplete="off"
+      required /></label
+  ><label
+    >Пароль<input
+      name="password"
+      type="password"
+      minlength="10"
+      maxlength="72"
+      autocomplete="new-password"
+      required /></label
+  ><label>Роль<select name="role" required></select></label
+  ><label>Готель<select name="hotelId"></select></label>
+  <p class="form-note">
+    Для Керуючого оберіть один готель. Для інших ролей залиште «Усі готелі».
+  </p></template
+>
+<template id="booking-form-template"
+  ><p class="form-note" data-summary></p>
+  <label>Заїзд<input name="startDate" type="date" required /></label
+  ><label>Виїзд<input name="endDate" type="date" required /></label
+></template>
+<template id="checkin-form-template"
+  ><p>Ціна цього проживання: <strong data-price></strong>.</p>
+  <label>Підстава<select name="bookingId"></select></label>
+  <p class="form-note">
+    Дані гостей не збираються. Час заселення фіксується зараз.
+  </p></template
+>

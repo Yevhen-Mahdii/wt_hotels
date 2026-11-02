@@ -66,6 +66,9 @@ public class SecurityConfig {
                 a.requestMatchers(
                         "/",
                         "/index.html",
+                        // Navigation cannot attach a Bearer token; only the HTML shell is public.
+                        "/pages/*.html",
+                        "/fragments/*.html",
                         "/js/**",
                         "/styles.css",
                         "/favicon.ico",

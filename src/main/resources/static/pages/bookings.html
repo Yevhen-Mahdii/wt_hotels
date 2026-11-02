@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#355b43" />
+    <title>Бронювання — Тихий двір</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <!-- Each page loads only its controller, which initializes the shared session and UI. -->
+    <script type="module" src="/js/pages/bookings.js"></script>
+  </head>
+  <body data-page="bookings">
+    <p id="page-status" class="loading" role="status">
+      Завантажуємо робочий простір…
+    </p>
+    <div class="shell" hidden>
+      <main id="main">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow" data-role-caption></div>
+            <h1>Бронювання</h1>
+            <p id="page-description">
+              Дати заїзду та виїзду рахуються від 12:00.
+            </p>
+          </div>
+        </div>
+        <div id="items" class="grid"></div>
+        <p id="empty" class="empty" hidden>
+          Бронювань поки немає. Адміністратор створює їх через пошук номерів.
+        </p>
+      </main>
+    </div>
+    <div id="notice" role="status" aria-live="polite" hidden></div>
+    <noscript>Для роботи застосунку увімкніть JavaScript.</noscript>
+  </body>
+</html>

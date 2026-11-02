@@ -1,55 +1,55 @@
-/** Uses the same form for first-run setup and login, saving a session only after API success. */
+/** Binds the static login page; first-run setup uses the same form with different labels. */
 import { rest } from "../core/rest.js";
 import { session } from "../core/session.js";
-import { state } from "../core/state.js";
-import { field } from "../ui/components.js";
-export function renderLogin(container, setup, onAuthenticated) {
-  container.innerHTML =
-    '<div class="auth-shell"><section class="auth-intro"><div class="eyebrow">Єдина мережа. Спільний простір.</div><div class="auth-ornament" aria-hidden="true">⌂</div><h2>Кожен номер.<br>Усе під контролем.</h2><p>Бронювання, щоденна робота готелю та підсумки — в одному спокійному робочому просторі.</p></section><section class="auth-card"><div class="brand"><span class="brand-mark">т</span>Тихий двір</div><div class="eyebrow">' +
-    (setup ? "Перший запуск" : "Раді бачити знову") +
-    "</div><h1>" +
-    (setup ? "Почнімо з Адміна" : "Вхід до системи") +
-    "</h1><p>" +
-    (setup
-      ? "Створіть обліковий запис Адміна. Після цього він зможе додати готелі та користувачів."
-      : "Увійдіть зі своїм робочим email і паролем.") +
-    '</p><form id="login" class="form-grid">' +
-    field(
-      "Email",
-      "email",
-      "email",
-      "",
-      'maxlength="180" autocomplete="username"',
-    ) +
-    field(
-      "Пароль",
-      "password",
-      "password",
-      "",
-      'minlength="10" maxlength="72" autocomplete="' +
-        (setup ? "new-password" : "current-password") +
-        '"',
-    ) +
-    '<p class="form-note">Щонайменше 10 символів у паролі.</p><p class="form-error" role="alert"></p><button>' +
-    (setup ? "Створити Адміна" : "Увійти") +
-    '</button></form><div class="auth-footer">Система керування мережею готелів</div></section></div>';
-  const form = document.querySelector("#login");
-  form.onsubmit = async (e) => {
-    e.preventDefault();
-    const button = form.querySelector("button");
-    button.disabled = true;
-    try {
-      const data = await (setup ? rest.auth.setup : rest.auth.login)(
-        Object.fromEntries(new FormData(form)),
-      );
-      session.save(data.token);
-      state.user = data.user;
-
-      await onAuthenticated();
-    } catch (error) {
-      form.querySelector(".form-error").textContent = error.message;
-    } finally {
-      button.disabled = false;
+import { afterLoginUrl } from "../core/routes.js";
+const form = document.querySelector("#login");
+const button = form.querySelector("button");
+const errorLabel = form.querySelector(".form-error");
+let setup = false;
+async function boot() {
+  try {
+    const status = await rest.auth.status();
+    setup = status.setupRequired;
+    if (session.token && !setup) {
+      try {
+        const user = await rest.auth.me();
+        location.replace(afterLoginUrl(user.role));
+        return;
+      } catch (error) {
+        if (error.status !== 401) throw error;
+        session.clear();
+      }
     }
-  };
+    if (setup) {
+      session.clear();
+      document.querySelector("#login-caption").textContent = "Перший запуск";
+      document.querySelector("#login-title").textContent = "Почнімо з Адміна";
+      document.querySelector("#login-description").textContent =
+        "Створіть обліковий запис Адміна. Після цього він зможе додати готелі та користувачів.";
+      form.elements.password.autocomplete = "new-password";
+      button.textContent = "Створити Адміна";
+    }
+    button.disabled = false;
+  } catch (error) {
+    errorLabel.textContent = error.message;
+  }
 }
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  button.disabled = true;
+  errorLabel.textContent = "";
+  try {
+    const response = await (setup ? rest.auth.setup : rest.auth.login)(
+      Object.fromEntries(new FormData(form)),
+    );
+    session.save(response.token);
+    location.assign(afterLoginUrl(response.user.role));
+  } catch (error) {
+    errorLabel.textContent = error.message;
+    button.disabled = false;
+  }
+});
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) location.reload();
+});
+boot();
