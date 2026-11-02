@@ -1,9 +1,14 @@
 package ua.edu.hotels.security;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.*;
+import org.mockito.Mock;
+import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -17,9 +22,10 @@ import ua.edu.hotels.repository.UserRepository;
  * Checks database-derived permissions and rejection of missing users or malformed token
  * subjects.
  */
+@ExtendWith(MockitoExtension.class)
 class HotelTokenConverterTest {
-  private final UserRepository userRepository = mock(UserRepository.class);
-  private final HotelTokenConverter hotelTokenConverter = new HotelTokenConverter(userRepository);
+  @Mock UserRepository userRepository;
+  @InjectMocks HotelTokenConverter hotelTokenConverter;
 
   private Jwt jwt(String subject) {
     return Jwt.withTokenValue("verified-jwt")

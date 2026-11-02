@@ -1,5 +1,8 @@
 package ua.edu.hotels.service;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.assertj.core.api.Assertions.*;
 import static ua.edu.hotels.support.Fixtures.*;
 
@@ -9,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import ua.edu.hotels.data.enums.*;
 
 /** Checks visible calendar conflicts between reservations and actual room state. */
+@ExtendWith(MockitoExtension.class)
 class CalendarDayFactoryTest {
   private final CalendarDayFactory calendarDayFactory =
       new CalendarDayFactory(new StayCalculator(CLOCK));

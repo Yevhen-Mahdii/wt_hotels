@@ -3,7 +3,8 @@ import { hotelName } from "../core/state.js";
 import { equipmentOptions } from "../core/catalog.js";
 import { escapeHtml as esc, money, today, addDays } from "../core/format.js";
 import { badge } from "./components.js";
-export function roomCard(r, search = false, bookings = [], currentDate = today()) {
+export function roomCard(r, search = false, bookings = []) {
+  const currentDate = today();
   const reservations = search
     ? []
     : bookings

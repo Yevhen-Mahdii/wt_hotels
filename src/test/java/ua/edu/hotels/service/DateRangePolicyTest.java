@@ -1,5 +1,8 @@
 package ua.edu.hotels.service;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.assertj.core.api.Assertions.*;
 import static ua.edu.hotels.support.Fixtures.CLOCK;
 
@@ -8,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 
 /** Checks date ordering, range limits and rejection of past booking dates. */
+@ExtendWith(MockitoExtension.class)
 class DateRangePolicyTest {
   private final DateRangePolicy dateRangePolicy = new DateRangePolicy(CLOCK);
   private final LocalDate today = LocalDate.now(CLOCK);

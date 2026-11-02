@@ -1,5 +1,8 @@
 package ua.edu.hotels.data;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.assertj.core.api.Assertions.*;
 
 import jakarta.persistence.AttributeConverter;
@@ -11,6 +14,7 @@ import ua.edu.hotels.data.converter.*;
 import ua.edu.hotels.data.enums.*;
 
 /** Checks explicit enum-code round trips and rejection of unknown persisted codes. */
+@ExtendWith(MockitoExtension.class)
 class EnumConverterTest {
   record Case<E extends Enum<E> & CodedEnum>(
       Class<E> type, AttributeConverter<E, Integer> converter) {}
