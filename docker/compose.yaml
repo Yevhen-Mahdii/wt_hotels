@@ -1,9 +1,13 @@
+name: wt_hotels
+
 services:
   hotels:
-    build: .
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     ports:
       - "127.0.0.1:8081:8080"
     # Keep the embedded database and signing key across container recreation.
     volumes:
-      - ./data:/app/data
+      - ../data:/app/data
     restart: unless-stopped

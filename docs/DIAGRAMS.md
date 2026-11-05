@@ -4,7 +4,7 @@
 
 | Діаграма | Рівень | Що пояснює | Відповідний код |
 | --- | --- | --- | --- |
-| [Архітектура](svg/architecture.svg) | Технічний | Браузер, один контейнер, Spring Security, сервіси, H2 та папка даних | `SecurityConfig`, `compose.yaml` |
+| [Архітектура](svg/architecture.svg) | Технічний | Браузер, один контейнер, Spring Security, сервіси, H2 та папка даних | `SecurityConfig`, `docker/compose.yaml` |
 | [Модель предметної області](svg/domain.svg) | Логічний | Ролі, користувачі, готелі, номери, бронювання, проживання й дохід; кратності зв’язків | `data/entity`, V1 |
 | [Початкове налаштування](svg/setup-flow.svg) | Процес | Синхронізація ролей, захист повторного setup, створення мережі й номерів | `HotelsApplication`, `AuthService`, `UserService` |
 | [Вхід і доступ](svg/authentication-sequence.svg) | Технічний | JWT → HotelToken, поточна роль із БД, 401 і 403 | `JwtService`, `HotelTokenConverter`, `HotelToken` |
