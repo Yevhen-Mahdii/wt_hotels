@@ -2,6 +2,7 @@
 import { rest } from "../core/rest.js";
 import { fragment, setValues } from "../ui/templates.js";
 import { openForm } from "../ui/modal.js";
+
 export function hotelForm(hotel, onSaved) {
   const fields = fragment("hotel-form-template");
   setValues(fields, { name: hotel?.name, address: hotel?.address });

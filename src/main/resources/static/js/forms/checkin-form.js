@@ -4,6 +4,7 @@ import { state } from "../core/state.js";
 import { money, today } from "../core/format.js";
 import { fragment, text } from "../ui/templates.js";
 import { openForm } from "../ui/modal.js";
+
 export function checkinForm(id, onSaved) {
   const room = state.rooms.find((r) => r.id === id);
   const currentDate = today();
@@ -21,11 +22,7 @@ export function checkinForm(id, onSaved) {
     .replaceChildren(
       ...(available.length
         ? available.map(
-            (b) =>
-              new Option(
-                `Бронювання #${b.id} · ${b.startDate} → ${b.endDate}`,
-                String(b.id),
-              ),
+            (b) => new Option(`Бронювання #${b.id} · ${b.startDate} → ${b.endDate}`, String(b.id)),
           )
         : [new Option("Без попереднього бронювання", "")]),
     );

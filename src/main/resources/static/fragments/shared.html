@@ -1,10 +1,14 @@
 <!-- Shared markup is inert until cloned by the page controller; data-* attributes are DOM binding hooks. -->
 <template id="shell-template">
   <header class="app-head">
-    <div class="brand"><span class="brand-mark">т</span>Тихий двір</div>
+    <div class="brand">
+      <span class="brand-mark">т</span>
+      Тихий двір
+    </div>
     <div class="account">
-      <span data-account-email></span><span data-account-role></span
-      ><button id="logout">Вийти</button>
+      <span data-account-email></span>
+      <span data-account-role></span>
+      <button id="logout">Вийти</button>
     </div>
   </header>
   <nav class="nav" aria-label="Головне меню">
@@ -17,28 +21,34 @@
     <a href="/pages/bookings.html" data-page="bookings">Бронювання</a>
     <a href="/pages/revenue.html" data-page="revenue">Дохід</a>
     <div class="sidebar-foot">
-      Розрахункова доба<br />12:00 → 12:00<br /><br />Часовий пояс: Київ
+      Розрахункова доба
+      <br />
+      12:00 → 12:00
+      <br />
+      <br />
+      Часовий пояс: Київ
     </div>
   </nav>
 </template>
-<template id="modal-template"
-  ><dialog id="modal">
+
+<template id="modal-template">
+  <dialog id="modal">
     <div class="dialog-top">
       <h2 id="modal-title"></h2>
-      <button id="close-modal" class="icon-button" aria-label="Закрити">
-        ×
-      </button>
+      <button id="close-modal" class="icon-button" aria-label="Закрити">×</button>
     </div>
     <form class="form-grid">
       <div id="modal-content" class="form-grid"></div>
       <p class="form-error" role="alert"></p>
       <button type="submit">Зберегти</button>
     </form>
-  </dialog></template
->
+  </dialog>
+</template>
+
 <template id="badge-template"><span class="badge"></span></template>
-<template id="hotel-card-template"
-  ><article class="card">
+
+<template id="hotel-card-template">
+  <article class="card">
     <div class="eyebrow">ГОТЕЛЬ</div>
     <h2 data-name></h2>
     <p class="muted" data-address></p>
@@ -46,16 +56,19 @@
     <div class="actions">
       <button class="secondary" data-edit>Редагувати</button>
     </div>
-  </article></template
->
-<template id="user-card-template"
-  ><article class="card">
+  </article>
+</template>
+
+<template id="user-card-template">
+  <article class="card">
     <div class="eyebrow" data-role></div>
     <h3 data-email></h3>
-    <p class="muted" data-hotel></p></article
-></template>
-<template id="booking-card-template"
-  ><article class="card">
+    <p class="muted" data-hotel></p>
+  </article>
+</template>
+
+<template id="booking-card-template">
+  <article class="card">
     <div class="card-top">
       <h3 data-number></h3>
       <span data-status></span>
@@ -63,13 +76,14 @@
     <small data-hotel></small>
     <p data-dates></p>
     <div class="actions">
-      <button class="secondary small" data-edit>Змінити дати</button
-      ><button class="danger small" data-cancel>Скасувати</button>
+      <button class="secondary small" data-edit>Змінити дати</button>
+      <button class="danger small" data-cancel>Скасувати</button>
     </div>
-  </article></template
->
-<template id="room-card-template"
-  ><article class="card">
+  </article>
+</template>
+
+<template id="room-card-template">
+  <article class="card">
     <div class="card-top">
       <div>
         <div class="eyebrow" data-hotel></div>
@@ -84,40 +98,54 @@
       </div>
     </div>
     <div class="room-meta">
-      <span data-beds></span><strong data-price></strong>
+      <span data-beds></span>
+      <strong data-price></strong>
     </div>
     <div class="amenities"></div>
     <div class="actions">
-      <button class="small" data-book>Забронювати</button
-      ><button class="secondary small" data-edit-room>Налаштування</button
-      ><button class="small" data-checkin>Заселити</button
-      ><button class="small" data-action="check-out">Виселити</button
-      ><button class="small" data-action="clean">Клінінг завершено</button>
+      <button class="small" data-book>Забронювати</button>
+      <button class="secondary small" data-edit-room>Налаштування</button>
+      <button class="small" data-checkin>Заселити</button>
+      <button class="small" data-action="check-out">Виселити</button>
+      <button class="small" data-action="clean">Клінінг завершено</button>
     </div>
-  </article></template
->
-<template id="reservation-dates-template"
-  ><div class="room-booking-dates">
-    <time data-start></time> → <time data-end></time></div
-></template>
+  </article>
+</template>
+
+<template id="reservation-dates-template">
+  <div class="room-booking-dates">
+    <time data-start></time>
+    →
+    <time data-end></time>
+  </div>
+</template>
+
 <template id="amenity-template"><span class="amenity"></span></template>
-<template id="no-amenities-template"
-  ><small>Без додаткового оснащення</small></template
->
-<template id="calendar-row-template"
-  ><tr>
-    <td><strong data-number></strong><br /><small data-hotel></small></td></tr
-></template>
-<template id="calendar-cell-template"
-  ><td>
+
+<template id="no-amenities-template"><small>Без додаткового оснащення</small></template>
+
+<template id="calendar-row-template">
+  <tr>
+    <td>
+      <strong data-number></strong>
+      <br />
+      <small data-hotel></small>
+    </td>
+  </tr>
+</template>
+
+<template id="calendar-cell-template">
+  <td>
     <div data-states></div>
     <span class="conflict-note" hidden>Увага: накладка станів</span>
-  </td></template
->
-<template id="revenue-row-template"
-  ><tr>
+  </td>
+</template>
+
+<template id="revenue-row-template">
+  <tr>
     <td data-hotel></td>
     <td data-date></td>
     <td data-nights></td>
-    <td data-amount></td></tr
-></template>
+    <td data-amount></td>
+  </tr>
+</template>

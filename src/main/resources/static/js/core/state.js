@@ -10,7 +10,7 @@ export const state = {
   page: "",
   filters: {},
 };
-export const hotelName = (id) =>
-  state.hotels.find((hotel) => hotel.id === id)?.name ?? "Готель";
-export const roomName = (id) =>
-  state.rooms.find((room) => room.id === id)?.number ?? id;
+
+export const hotelName = (id) => state.hotels.find((hotel) => hotel.id === id)?.name ?? "Готель";
+
+export const roomName = (id) => state.rooms.find((room) => room.id === id)?.number ?? id;

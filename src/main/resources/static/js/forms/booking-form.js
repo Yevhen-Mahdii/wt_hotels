@@ -4,6 +4,7 @@ import { state, hotelName } from "../core/state.js";
 import { money, today } from "../core/format.js";
 import { fragment, text, setValues } from "../ui/templates.js";
 import { openForm } from "../ui/modal.js";
+
 export function bookingForm(booking, roomId, onSaved) {
   roomId = booking?.roomId ?? roomId;
   const room = state.rooms.find((r) => r.id === roomId);
