@@ -1,6 +1,7 @@
 package ua.edu.hotels.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,6 +27,7 @@ import static org.springframework.http.HttpStatus.CONFLICT;
  * Transitions rooms through occupancy and cleaning, recording revenue atomically at checkout.
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class StayService {
@@ -42,19 +44,25 @@ public class StayService {
     actor.requireRole(Role.MANAGER);
     Room room = roomService.lock(roomId);
     actor.requireHotelAccess(room.getHotelId());
-    if (room.getState() != RoomState.FREE)
+    if (room.getState() != RoomState.FREE) {
+      log.warn("Check-in rejected: room is not free; roomId={}, state={}", roomId, room.getState());
       throw new ResponseStatusException(CONFLICT, "Спочатку звільніть номер і завершіть клінінг");
+    }
     LocalDate today = LocalDate.now(clock);
     if (bookingId != null) {
       Booking booking = bookingRepository.findById(bookingId).orElseThrow(ServiceErrors::notFound);
       if (!booking.getRoomId().equals(roomId)
         || booking.getStatus() != BookingStatus.RESERVED
         || today.isBefore(booking.getStartDate())
-        || !today.isBefore(booking.getEndDate()))
+        || !today.isBefore(booking.getEndDate())) {
+        log.warn("Check-in rejected: booking does not match room, status or date; roomId={}, bookingId={}",
+          roomId, bookingId);
         throw new ResponseStatusException(
           CONFLICT, "Бронювання не відповідає номеру або даті заселення");
+      }
       booking.setStatus(BookingStatus.CHECKED_IN);
     } else if (bookingService.overlaps(roomId, today, today.plusDays(1), null)) {
+      log.warn("Walk-in rejected: room has an active booking today; roomId={}", roomId);
       throw new ResponseStatusException(
         CONFLICT, "На сьогодні є бронювання: оберіть заселення за ним");
     }
@@ -65,7 +73,10 @@ public class StayService {
     // Snapshot the nightly rate; later room-price edits must not change this stay.
     stay.setPrice(room.getPrice());
     room.setState(RoomState.OCCUPIED);
-    return stayRepository.save(stay);
+    Stay saved = stayRepository.save(stay);
+    TransactionLog.info(log, "Check-in completed: stayId={}, roomId={}, bookingId={}, actorId={}",
+      saved.getId(), roomId, bookingId, actor.getUserId());
+    return saved;
   }
 
   @Transactional
@@ -73,8 +84,10 @@ public class StayService {
     actor.requireRole(Role.MANAGER);
     Room room = roomService.lock(roomId);
     actor.requireHotelAccess(room.getHotelId());
-    if (room.getState() != RoomState.OCCUPIED)
+    if (room.getState() != RoomState.OCCUPIED) {
+      log.warn("Check-out rejected: room is not occupied; roomId={}, state={}", roomId, room.getState());
       throw new ResponseStatusException(CONFLICT, "Номер не зайнятий");
+    }
     Stay stay =
       stayRepository
         .findByRoomIdAndCheckedOutAtIsNull(roomId)
@@ -93,7 +106,10 @@ public class StayService {
         .findById(stay.getBookingId())
         .orElseThrow(ServiceErrors::notFound)
         .setStatus(BookingStatus.COMPLETED);
-    return revenueRepository.save(income);
+    Revenue saved = revenueRepository.save(income);
+    TransactionLog.info(log, "Check-out completed: stayId={}, roomId={}, revenueId={}, actorId={}",
+      stay.getId(), roomId, saved.getId(), actor.getUserId());
+    return saved;
   }
 
   @Transactional
@@ -101,9 +117,14 @@ public class StayService {
     actor.requireRole(Role.MANAGER);
     Room room = roomService.lock(roomId);
     actor.requireHotelAccess(room.getHotelId());
-    if (room.getState() != RoomState.CLEANING)
+    if (room.getState() != RoomState.CLEANING) {
+      log.warn("Cleaning rejected: room does not require cleaning; roomId={}, state={}",
+        roomId, room.getState());
       throw new ResponseStatusException(CONFLICT, "Номер не потребує клінінгу");
+    }
     room.setState(RoomState.FREE);
+    TransactionLog.info(log, "Cleaning completed: roomId={}, actorId={}",
+      roomId, actor.getUserId());
     return room;
   }
 }

@@ -1,6 +1,7 @@
 package ua.edu.hotels.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -14,6 +15,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
  * Validates half-open date ranges; booking dates must not start in the past.
  */
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class DateRangePolicy {
   public static final long MAX_DAYS = 366;
@@ -23,13 +25,17 @@ public class DateRangePolicy {
     if (start == null
       || end == null
       || !end.isAfter(start)
-      || ChronoUnit.DAYS.between(start, end) > MAX_DAYS)
+      || ChronoUnit.DAYS.between(start, end) > MAX_DAYS) {
+      log.warn("Date range rejected: expected 1 to 366 nights; start={}, end={}", start, end);
       throw new ResponseStatusException(BAD_REQUEST, "Оберіть період від 1 до 366 ночей");
+    }
   }
 
   public void validateBooking(LocalDate start, LocalDate end) {
     validate(start, end);
-    if (start.isBefore(LocalDate.now(clock)))
+    if (start.isBefore(LocalDate.now(clock))) {
+      log.warn("Booking rejected: start date is in the past; start={}", start);
       throw new ResponseStatusException(BAD_REQUEST, "Не можна бронювати минулі дати");
+    }
   }
 }

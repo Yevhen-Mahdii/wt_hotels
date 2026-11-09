@@ -1,6 +1,7 @@
 package ua.edu.hotels.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +20,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
  * Maintains room details within manager scope and exposes locking for lifecycle operations.
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RoomService {
@@ -47,8 +49,10 @@ public class RoomService {
     Room room = id == null ? new Room() : lock(id);
     if (id != null) {
       actor.requireHotelAccess(room.getHotelId());
-      if (!room.getHotelId().equals(input.hotelId()))
+      if (!room.getHotelId().equals(input.hotelId())) {
+        log.warn("Room update rejected: moving a room between hotels is not allowed; roomId={}", id);
         throw new ResponseStatusException(BAD_REQUEST, "Не можна переносити номер між готелями");
+      }
     }
     room.setHotelId(input.hotelId());
     room.setNumber(input.number().trim());

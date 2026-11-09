@@ -1,6 +1,7 @@
 package ua.edu.hotels.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,6 +19,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
  * Handles login and serializes first-run administrator creation in a database transaction.
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthService {
@@ -34,12 +36,16 @@ public class AuthService {
   @Transactional
   public AuthResponse setup(Credentials input) {
     setupLockRepository.lock();
-    if (!needsSetup()) throw new ResponseStatusException(CONFLICT, "Систему вже налаштовано");
+    if (!needsSetup()) {
+      log.warn("Initial setup rejected: system is already configured");
+      throw new ResponseStatusException(CONFLICT, "Систему вже налаштовано");
+    }
     User user = new User();
     user.setEmail(PasswordService.normalizeEmail(input.email()));
     user.setPasswordHash(passwordService.hash(input.password()));
     user.setAssignedRole(roleService.get(Role.ADMIN));
     userRepository.save(user);
+    TransactionLog.info(log, "Initial administrator created: userId={}", user.getId());
     return new AuthResponse(jwtService.issue(user), user);
   }
 
@@ -54,13 +60,20 @@ public class AuthService {
   }
 
   public User current(ua.edu.hotels.security.HotelToken token) {
-    if (token == null) throw new ResponseStatusException(UNAUTHORIZED);
+    if (token == null) {
+      log.warn("Current user lookup rejected: authentication is missing");
+      throw new ResponseStatusException(UNAUTHORIZED);
+    }
     return userRepository
       .findById(token.getUserId())
-      .orElseThrow(() -> new ResponseStatusException(UNAUTHORIZED));
+      .orElseThrow(() -> {
+        log.warn("Current user lookup rejected: user no longer exists; userId={}", token.getUserId());
+        return new ResponseStatusException(UNAUTHORIZED);
+      });
   }
 
   private ResponseStatusException invalidCredentials() {
+    log.warn("Login rejected: invalid credentials");
     return new ResponseStatusException(UNAUTHORIZED, "Невірний email або пароль");
   }
 }

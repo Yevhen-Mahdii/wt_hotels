@@ -1,6 +1,7 @@
 package ua.edu.hotels.security;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +18,7 @@ import java.util.List;
  * Builds a request principal from a verified JWT and the current database user record.
  */
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class HotelTokenConverter implements Converter<Jwt, AbstractAuthenticationToken> {
   private final UserRepository userRepository;
@@ -28,7 +30,10 @@ public class HotelTokenConverter implements Converter<Jwt, AbstractAuthenticatio
     var user =
       userRepository
         .findById(userId)
-        .orElseThrow(() -> new InvalidBearerTokenException("User no longer exists"));
+        .orElseThrow(() -> {
+          log.warn("Bearer authentication rejected: user no longer exists; userId={}", userId);
+          return new InvalidBearerTokenException("User no longer exists");
+        });
     // Read permissions from the database for each request, not from client claims.
     var principal =
       new HotelToken(user.getId(), user.getEmail(), user.getRole(), user.getHotelId());
@@ -43,6 +48,7 @@ public class HotelTokenConverter implements Converter<Jwt, AbstractAuthenticatio
     } catch (NumberFormatException ignored) {
       /* Convert malformed identities to HTTP 401. */
     }
+    log.warn("Bearer authentication rejected: invalid user identity");
     throw new InvalidBearerTokenException("Invalid user identity");
   }
 }
