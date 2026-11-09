@@ -110,6 +110,7 @@ class BookingServiceTest {
   @Test
   void editingExcludesOwnBookingFromOverlapCheck() {
     Booking existing = booking();
+    when(bookingRepository.save(any())).thenAnswer(call -> call.getArgument(0));
     when(roomService.lock(20L)).thenReturn(room(RoomState.FREE));
     when(bookingRepository.findById(30L)).thenReturn(Optional.of(existing));
     var changed = new BookingInput(20L, input().startDate().plusDays(1), input().endDate().plusDays(1));

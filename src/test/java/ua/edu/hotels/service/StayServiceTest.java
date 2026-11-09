@@ -79,6 +79,7 @@ class StayServiceTest {
   @Test
   void matchingBookingIsCheckedIn() {
     Booking booking = booking();
+    when(stayRepository.save(any())).thenAnswer(call -> call.getArgument(0));
     when(roomService.lock(20L)).thenReturn(room(RoomState.FREE));
     when(bookingRepository.findById(30L)).thenReturn(Optional.of(booking));
     stayService.checkIn(user(Role.MANAGER), 20L, 30L);

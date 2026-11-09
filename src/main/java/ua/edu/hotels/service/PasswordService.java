@@ -1,6 +1,7 @@
 package ua.edu.hotels.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,15 +15,18 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
  * Hashes passwords with the configured encoder and normalizes login email addresses.
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PasswordService {
   private final PasswordEncoder passwordEncoder;
 
   public String hash(String password) {
     // BCrypt limits bytes, not Java characters; reject oversized UTF-8 input before hashing.
-    if (password.getBytes(StandardCharsets.UTF_8).length > 72)
+    if (password.getBytes(StandardCharsets.UTF_8).length > 72) {
+      log.warn("Password rejected: exceeds the 72-byte UTF-8 limit");
       throw new ResponseStatusException(
         BAD_REQUEST, "Пароль має містити не більше 72 байтів UTF-8");
+    }
     return passwordEncoder.encode(password);
   }
 
