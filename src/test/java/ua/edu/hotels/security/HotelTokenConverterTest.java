@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.*;
+
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
@@ -24,15 +25,17 @@ import ua.edu.hotels.repository.UserRepository;
  */
 @ExtendWith(MockitoExtension.class)
 class HotelTokenConverterTest {
-  @Mock UserRepository userRepository;
-  @InjectMocks HotelTokenConverter hotelTokenConverter;
+  @Mock
+  UserRepository userRepository;
+  @InjectMocks
+  HotelTokenConverter hotelTokenConverter;
 
   private Jwt jwt(String subject) {
     return Jwt.withTokenValue("verified-jwt")
-        .header("alg", "HS256")
-        .subject(subject)
-        .claim("role", "ADMIN")
-        .build();
+      .header("alg", "HS256")
+      .subject(subject)
+      .claim("role", "ADMIN")
+      .build();
   }
 
   @Test
@@ -57,13 +60,13 @@ class HotelTokenConverterTest {
   @ValueSource(strings = {"abc", "-1", "0", "99999999999999999999999"})
   void rejectsInvalidSubject(String subject) {
     assertThatThrownBy(() -> hotelTokenConverter.convert(jwt(subject)))
-        .isInstanceOf(InvalidBearerTokenException.class);
+      .isInstanceOf(InvalidBearerTokenException.class);
     verifyNoInteractions(userRepository);
   }
 
   @Test
   void rejectsMissingUser() {
     assertThatThrownBy(() -> hotelTokenConverter.convert(jwt("5")))
-        .isInstanceOf(InvalidBearerTokenException.class);
+      .isInstanceOf(InvalidBearerTokenException.class);
   }
 }

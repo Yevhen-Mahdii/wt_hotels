@@ -1,14 +1,18 @@
 package ua.edu.hotels.data.entity;
 
-import jakarta.persistence.*;
-import java.math.BigDecimal;
-import java.time.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ua.edu.hotels.data.enums.*;
 
-/** Records actual occupancy timestamps and the nightly price captured at check-in. */
+import java.math.BigDecimal;
+import java.time.Instant;
+
+/**
+ * Records actual occupancy timestamps and the nightly price captured at check-in.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

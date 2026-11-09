@@ -1,11 +1,17 @@
 package ua.edu.hotels.service;
 
-import java.time.*;
-import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-/** Calculates accounting days in the configured time zone using noon as the day boundary. */
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+
+/**
+ * Calculates accounting days in the configured time zone using noon as the day boundary.
+ */
 @Component
 @RequiredArgsConstructor
 public class StayCalculator {
@@ -14,8 +20,8 @@ public class StayCalculator {
   public LocalDate accountingDay(Instant instant) {
     var local = instant.atZone(clock.getZone());
     return local.toLocalTime().isBefore(LocalTime.NOON)
-        ? local.toLocalDate().minusDays(1)
-        : local.toLocalDate();
+      ? local.toLocalDate().minusDays(1)
+      : local.toLocalDate();
   }
 
   public Instant boundary(LocalDate date) {

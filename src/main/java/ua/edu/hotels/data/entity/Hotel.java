@@ -1,13 +1,15 @@
 package ua.edu.hotels.data.entity;
 
-import jakarta.persistence.*;
-import java.time.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ua.edu.hotels.data.enums.*;
 
-/** Represents one hotel within the single managed network. */
+/**
+ * Represents one hotel within the single managed network.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

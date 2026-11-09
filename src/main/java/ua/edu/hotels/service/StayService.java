@@ -1,21 +1,30 @@
 package ua.edu.hotels.service;
 
-import static org.springframework.http.HttpStatus.*;
-
-import java.math.BigDecimal;
-import java.time.*;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import ua.edu.hotels.data.dto.*;
-import ua.edu.hotels.data.entity.*;
-import ua.edu.hotels.data.enums.*;
-import ua.edu.hotels.repository.*;
+import ua.edu.hotels.data.entity.Booking;
+import ua.edu.hotels.data.entity.Revenue;
+import ua.edu.hotels.data.entity.Room;
+import ua.edu.hotels.data.entity.Stay;
+import ua.edu.hotels.data.enums.BookingStatus;
+import ua.edu.hotels.data.enums.Role;
+import ua.edu.hotels.data.enums.RoomState;
+import ua.edu.hotels.repository.BookingRepository;
+import ua.edu.hotels.repository.RevenueRepository;
+import ua.edu.hotels.repository.StayRepository;
 import ua.edu.hotels.security.HotelToken;
 
-/** Transitions rooms through occupancy and cleaning, recording revenue atomically at checkout. */
+import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.LocalDate;
+
+import static org.springframework.http.HttpStatus.CONFLICT;
+
+/**
+ * Transitions rooms through occupancy and cleaning, recording revenue atomically at checkout.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -39,15 +48,15 @@ public class StayService {
     if (bookingId != null) {
       Booking booking = bookingRepository.findById(bookingId).orElseThrow(ServiceErrors::notFound);
       if (!booking.getRoomId().equals(roomId)
-          || booking.getStatus() != BookingStatus.RESERVED
-          || today.isBefore(booking.getStartDate())
-          || !today.isBefore(booking.getEndDate()))
+        || booking.getStatus() != BookingStatus.RESERVED
+        || today.isBefore(booking.getStartDate())
+        || !today.isBefore(booking.getEndDate()))
         throw new ResponseStatusException(
-            CONFLICT, "Бронювання не відповідає номеру або даті заселення");
+          CONFLICT, "Бронювання не відповідає номеру або даті заселення");
       booking.setStatus(BookingStatus.CHECKED_IN);
     } else if (bookingService.overlaps(roomId, today, today.plusDays(1), null)) {
       throw new ResponseStatusException(
-          CONFLICT, "На сьогодні є бронювання: оберіть заселення за ним");
+        CONFLICT, "На сьогодні є бронювання: оберіть заселення за ним");
     }
     Stay stay = new Stay();
     stay.setRoomId(roomId);
@@ -67,9 +76,9 @@ public class StayService {
     if (room.getState() != RoomState.OCCUPIED)
       throw new ResponseStatusException(CONFLICT, "Номер не зайнятий");
     Stay stay =
-        stayRepository
-            .findByRoomIdAndCheckedOutAtIsNull(roomId)
-            .orElseThrow(ServiceErrors::notFound);
+      stayRepository
+        .findByRoomIdAndCheckedOutAtIsNull(roomId)
+        .orElseThrow(ServiceErrors::notFound);
     stay.setCheckedOutAt(clock.instant());
     // Stay completion, room cleaning state and revenue commit together or roll back together.
     Revenue income = new Revenue();
@@ -81,9 +90,9 @@ public class StayService {
     room.setState(RoomState.CLEANING);
     if (stay.getBookingId() != null)
       bookingRepository
-          .findById(stay.getBookingId())
-          .orElseThrow(ServiceErrors::notFound)
-          .setStatus(BookingStatus.COMPLETED);
+        .findById(stay.getBookingId())
+        .orElseThrow(ServiceErrors::notFound)
+        .setStatus(BookingStatus.COMPLETED);
     return revenueRepository.save(income);
   }
 

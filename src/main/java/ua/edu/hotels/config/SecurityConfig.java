@@ -1,19 +1,27 @@
 package ua.edu.hotels.config;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import java.nio.file.*;
-import java.security.SecureRandom;
-import java.util.*;
-import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 /**
  * Configures stateless bearer authentication, signing-key persistence and browser security
@@ -34,7 +42,7 @@ public class SecurityConfig {
       byte[] key = new byte[32];
       new SecureRandom().nextBytes(key);
       Files.writeString(
-          path, Base64.getEncoder().encodeToString(key), StandardOpenOption.CREATE_NEW);
+        path, Base64.getEncoder().encodeToString(key), StandardOpenOption.CREATE_NEW);
     }
     byte[] bytes = Base64.getDecoder().decode(Files.readString(path).trim());
     if (bytes.length < 32)
@@ -56,37 +64,37 @@ public class SecurityConfig {
 
   @Bean
   SecurityFilterChain security(
-      HttpSecurity http, ua.edu.hotels.security.HotelTokenConverter hotelTokenConverter)
-      throws Exception {
+    HttpSecurity http, ua.edu.hotels.security.HotelTokenConverter hotelTokenConverter)
+    throws Exception {
     // Only explicit Bearer tokens are accepted; authentication does not use cookies.
     return http.csrf(c -> c.disable())
-        .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(
-            a ->
-                a.requestMatchers(
-                        "/",
-                        "/index.html",
-                        // Navigation cannot attach a Bearer token; only the HTML shell is public.
-                        "/pages/*.html",
-                        "/fragments/*.html",
-                        "/js/**",
-                        "/styles.css",
-                        "/favicon.ico",
-                        "/api/auth/**",
-                        "/api/catalog")
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated())
-        .oauth2ResourceServer(
-            o -> o.jwt(jwt -> jwt.jwtAuthenticationConverter(hotelTokenConverter)))
-        .headers(
-            h ->
-                h.contentSecurityPolicy(
-                    c ->
-                        c.policyDirectives(
-                            "default-src 'self'; script-src 'self'; style-src 'self'; img-src"
-                                + " 'self' data:; frame-ancestors 'none'; base-uri 'self';"
-                                + " form-action 'self'")))
-        .build();
+      .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      .authorizeHttpRequests(
+        a ->
+          a.requestMatchers(
+              "/",
+              "/index.html",
+              // Navigation cannot attach a Bearer token; only the HTML shell is public.
+              "/pages/*.html",
+              "/fragments/*.html",
+              "/js/**",
+              "/styles.css",
+              "/favicon.ico",
+              "/api/auth/**",
+              "/api/catalog")
+            .permitAll()
+            .anyRequest()
+            .authenticated())
+      .oauth2ResourceServer(
+        o -> o.jwt(jwt -> jwt.jwtAuthenticationConverter(hotelTokenConverter)))
+      .headers(
+        h ->
+          h.contentSecurityPolicy(
+            c ->
+              c.policyDirectives(
+                "default-src 'self'; script-src 'self'; style-src 'self'; img-src"
+                  + " 'self' data:; frame-ancestors 'none'; base-uri 'self';"
+                  + " form-action 'self'")))
+      .build();
   }
 }

@@ -1,20 +1,19 @@
 package ua.edu.hotels.service;
 
-import static org.springframework.http.HttpStatus.*;
-
-import java.math.BigDecimal;
-import java.time.*;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.edu.hotels.data.dto.*;
-import ua.edu.hotels.data.entity.*;
-import ua.edu.hotels.data.enums.*;
-import ua.edu.hotels.repository.*;
+import ua.edu.hotels.data.dto.RevenueSummary;
+import ua.edu.hotels.data.entity.Revenue;
+import ua.edu.hotels.repository.RevenueRepository;
 import ua.edu.hotels.security.HotelToken;
 
-/** Aggregates completed-stay revenue by checkout time within noon-to-noon boundaries. */
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+/**
+ * Aggregates completed-stay revenue by checkout time within noon-to-noon boundaries.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -28,10 +27,10 @@ public class RevenueService {
     dateRangePolicy.validate(start, end);
     Long filter = actor.hotelFilter(hotelId);
     var items =
-        revenueRepository.findForPeriod(
-            stayCalculator.boundary(start), stayCalculator.boundary(end), filter);
+      revenueRepository.findForPeriod(
+        stayCalculator.boundary(start), stayCalculator.boundary(end), filter);
     BigDecimal total =
-        items.stream().map(Revenue::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+      items.stream().map(Revenue::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
     return new RevenueSummary(total, items);
   }
 }

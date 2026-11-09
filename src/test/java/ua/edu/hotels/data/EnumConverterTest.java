@@ -6,25 +6,30 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.*;
 
 import jakarta.persistence.AttributeConverter;
+
 import java.util.*;
 import java.util.stream.Stream;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import ua.edu.hotels.data.converter.*;
 import ua.edu.hotels.data.enums.*;
 
-/** Checks explicit enum-code round trips and rejection of unknown persisted codes. */
+/**
+ * Checks explicit enum-code round trips and rejection of unknown persisted codes.
+ */
 @ExtendWith(MockitoExtension.class)
 class EnumConverterTest {
   record Case<E extends Enum<E> & CodedEnum>(
-      Class<E> type, AttributeConverter<E, Integer> converter) {}
+    Class<E> type, AttributeConverter<E, Integer> converter) {
+  }
 
   static Stream<Case<?>> cases() {
     return Stream.of(
-        new Case<>(Role.class, new RoleConverter()),
-        new Case<>(RoomState.class, new RoomStateConverter()),
-        new Case<>(BookingStatus.class, new BookingStatusConverter()),
-        new Case<>(Equipment.class, new EquipmentConverter()));
+      new Case<>(Role.class, new RoleConverter()),
+      new Case<>(RoomState.class, new RoomStateConverter()),
+      new Case<>(BookingStatus.class, new BookingStatusConverter()),
+      new Case<>(Equipment.class, new EquipmentConverter()));
   }
 
   @ParameterizedTest
@@ -42,7 +47,7 @@ class EnumConverterTest {
   @MethodSource("cases")
   void rejectsUnknownDatabaseCode(Case<?> test) {
     assertThatThrownBy(() -> test.converter().convertToEntityAttribute(999))
-        .isInstanceOf(IllegalArgumentException.class);
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @ParameterizedTest

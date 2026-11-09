@@ -12,7 +12,9 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.web.server.ResponseStatusException;
 import ua.edu.hotels.data.enums.Role;
 
-/** Checks role restrictions and prevents managers from accessing another hotel. */
+/**
+ * Checks role restrictions and prevents managers from accessing another hotel.
+ */
 @ExtendWith(MockitoExtension.class)
 class HotelTokenAccessTest {
 
@@ -25,7 +27,7 @@ class HotelTokenAccessTest {
   @Test
   void rejectsWrongRole() {
     assertThatThrownBy(() -> user(Role.MANAGER).requireRole(Role.ADMINISTRATOR))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
   }
 
   @Test
@@ -36,7 +38,7 @@ class HotelTokenAccessTest {
   @Test
   void managerCannotSelectAnotherHotel() {
     assertThatThrownBy(() -> user(Role.MANAGER).hotelFilter(11L))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
   }
 
   @Test
@@ -47,6 +49,6 @@ class HotelTokenAccessTest {
   @Test
   void systemAdminCannotReadRevenue() {
     assertThatThrownBy(() -> user(Role.ADMIN).requireRevenueAccess())
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
   }
 }

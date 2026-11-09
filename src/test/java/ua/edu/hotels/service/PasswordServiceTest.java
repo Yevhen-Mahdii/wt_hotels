@@ -12,16 +12,20 @@ import org.mockito.InjectMocks;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Checks password hashing, byte limits and email normalization. */
+/**
+ * Checks password hashing, byte limits and email normalization.
+ */
 @ExtendWith(MockitoExtension.class)
 class PasswordServiceTest {
-  @Mock PasswordEncoder encoder;
-  @InjectMocks PasswordService passwords;
+  @Mock
+  PasswordEncoder encoder;
+  @InjectMocks
+  PasswordService passwords;
 
   @Test
   void checksUtf8BytesBeforeBcrypt() {
     assertThatThrownBy(() -> passwords.hash("ї".repeat(37)))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
     verifyNoInteractions(encoder);
   }
 
@@ -35,6 +39,6 @@ class PasswordServiceTest {
   @Test
   void normalizesEmail() {
     assertThat(PasswordService.normalizeEmail(" ADMIN@Example.test "))
-        .isEqualTo("admin@example.test");
+      .isEqualTo("admin@example.test");
   }
 }

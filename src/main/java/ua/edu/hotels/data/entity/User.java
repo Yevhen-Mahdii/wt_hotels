@@ -1,14 +1,21 @@
 package ua.edu.hotels.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import java.time.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ua.edu.hotels.data.enums.*;
+import ua.edu.hotels.data.enums.Role;
 
-/** Stores a staff account; password hashes and role relationships are excluded from JSON. */
+/**
+ * Stores a staff account; password hashes and role relationships are excluded from JSON.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

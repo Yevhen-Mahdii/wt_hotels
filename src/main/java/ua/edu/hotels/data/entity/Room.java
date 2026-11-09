@@ -1,12 +1,20 @@
 package ua.edu.hotels.data.entity;
 
-import jakarta.persistence.*;
-import java.math.BigDecimal;
-import java.time.*;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ua.edu.hotels.data.enums.*;
+import ua.edu.hotels.data.enums.Equipment;
+import ua.edu.hotels.data.enums.RoomState;
+
+import java.math.BigDecimal;
 
 /**
  * Stores current physical state and amenities; future reservations are separate booking records.

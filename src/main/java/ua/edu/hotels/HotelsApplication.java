@@ -7,7 +7,9 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import ua.edu.hotels.service.RoleService;
 
-/** Starts the service and synchronizes the role catalog after application startup. */
+/**
+ * Starts the service and synchronizes the role catalog after application startup.
+ */
 @SpringBootApplication
 @RequiredArgsConstructor
 public class HotelsApplication {

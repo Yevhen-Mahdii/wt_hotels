@@ -1,7 +1,11 @@
 package ua.edu.hotels.data.dto;
 
-import java.util.List;
-import ua.edu.hotels.data.entity.*;
+import ua.edu.hotels.data.entity.Room;
 
-/** Groups the requested calendar days under their room details. */
-public record CalendarRow(Room room, List<CalendarDay> days) {}
+import java.util.List;
+
+/**
+ * Groups the requested calendar days under their room details.
+ */
+public record CalendarRow(Room room, List<CalendarDay> days) {
+}

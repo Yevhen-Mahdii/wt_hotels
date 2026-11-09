@@ -1,13 +1,18 @@
 package ua.edu.hotels.data.entity;
 
-import jakarta.persistence.*;
-import java.time.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ua.edu.hotels.data.enums.*;
+import ua.edu.hotels.data.enums.BookingStatus;
 
-/** Stores a planned room reservation with an exclusive departure date and no guest information. */
+import java.time.LocalDate;
+
+/**
+ * Stores a planned room reservation with an exclusive departure date and no guest information.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

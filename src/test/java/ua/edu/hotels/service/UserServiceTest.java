@@ -17,21 +17,28 @@ import ua.edu.hotels.data.entity.UserRole;
 import ua.edu.hotels.data.enums.Role;
 import ua.edu.hotels.repository.UserRepository;
 
-/** Checks role assignment and account-creation rules, not repository delegation. */
+/**
+ * Checks role assignment and account-creation rules, not repository delegation.
+ */
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-  @Mock UserRepository users;
-  @Mock HotelService hotels;
-  @Mock PasswordService passwords;
-  @Mock RoleService roles;
-  @InjectMocks UserService service;
+  @Mock
+  UserRepository users;
+  @Mock
+  HotelService hotels;
+  @Mock
+  PasswordService passwords;
+  @Mock
+  RoleService roles;
+  @InjectMocks
+  UserService service;
 
   @ParameterizedTest
   @EnumSource(value = Role.class, names = {"ADMINISTRATOR", "MANAGER"})
   void onlyAdminCanCreateStaff(Role actorRole) {
     var input = new UserInput("staff@example.test", "long-password", Role.MANAGER, 10L);
     assertThatThrownBy(() -> service.create(user(actorRole), input))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
     verifyNoInteractions(users, hotels, passwords, roles);
   }
 
@@ -40,7 +47,7 @@ class UserServiceTest {
   void nonManagerCannotHaveHotelAssignment(Role role) {
     var input = new UserInput("staff@example.test", "long-password", role, 10L);
     assertThatThrownBy(() -> service.create(user(Role.ADMIN), input))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
     verifyNoInteractions(users, hotels, passwords, roles);
   }
 
@@ -50,7 +57,7 @@ class UserServiceTest {
     when(roles.get(Role.MANAGER)).thenReturn(UserRole.from(Role.MANAGER));
     when(users.save(any())).thenAnswer(call -> call.getArgument(0));
     var result = service.create(user(Role.ADMIN),
-        new UserInput(" STAFF@Example.test ", "long-password", Role.MANAGER, 10L));
+      new UserInput(" STAFF@Example.test ", "long-password", Role.MANAGER, 10L));
     assertThat(result.getHotelId()).isEqualTo(10L);
     assertThat(result.getRole()).isEqualTo(Role.MANAGER);
     assertThat(result.getEmail()).isEqualTo("staff@example.test");

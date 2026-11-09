@@ -3,7 +3,9 @@ package ua.edu.hotels.data.enums;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/** Codes are persistent identifiers. Never reuse or reorder codes in migrations. */
+/**
+ * Codes are persistent identifiers. Never reuse or reorder codes in migrations.
+ */
 @Getter
 @RequiredArgsConstructor
 public enum RoomState implements CodedEnum {

@@ -1,26 +1,34 @@
 package ua.edu.hotels.service;
 
-import static org.springframework.http.HttpStatus.*;
-
-import java.time.*;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import ua.edu.hotels.data.dto.*;
-import ua.edu.hotels.data.entity.*;
-import ua.edu.hotels.data.enums.*;
-import ua.edu.hotels.repository.*;
+import ua.edu.hotels.data.dto.BookingInput;
+import ua.edu.hotels.data.dto.SearchResult;
+import ua.edu.hotels.data.entity.Booking;
+import ua.edu.hotels.data.entity.Room;
+import ua.edu.hotels.data.enums.BookingStatus;
+import ua.edu.hotels.data.enums.Role;
+import ua.edu.hotels.repository.BookingRepository;
 import ua.edu.hotels.security.HotelToken;
 
-/** Manages future reservations independently of the current physical room state. */
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
+
+/**
+ * Manages future reservations independently of the current physical room state.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BookingService {
   private static final List<BookingStatus> ACTIVE_STATUSES =
-      List.of(BookingStatus.RESERVED, BookingStatus.CHECKED_IN);
+    List.of(BookingStatus.RESERVED, BookingStatus.CHECKED_IN);
   private final BookingRepository bookingRepository;
   private final RoomService roomService;
   private final DateRangePolicy dateRangePolicy;
@@ -30,7 +38,7 @@ public class BookingService {
   }
 
   public SearchResult search(
-      HotelToken actor, LocalDate start, LocalDate end, int beds, Long hotelId) {
+    HotelToken actor, LocalDate start, LocalDate end, int beds, Long hotelId) {
     actor.requireRole(Role.ADMINISTRATOR);
     dateRangePolicy.validateBooking(start, end);
     if (beds < 1 || beds > 20)
@@ -56,13 +64,13 @@ public class BookingService {
     // Lock before checking overlap so simultaneous requests cannot both reserve the same interval.
     Room room = roomService.lock(input.roomId());
     Booking booking =
-        id == null
-            ? new Booking()
-            : bookingRepository.findById(id).orElseThrow(ServiceErrors::notFound);
+      id == null
+        ? new Booking()
+        : bookingRepository.findById(id).orElseThrow(ServiceErrors::notFound);
     if (id != null) {
       if (!booking.getRoomId().equals(room.getId()))
         throw new ResponseStatusException(
-            BAD_REQUEST, "Для зміни номера скасуйте бронювання та створіть нове");
+          BAD_REQUEST, "Для зміни номера скасуйте бронювання та створіть нове");
       requireReserved(booking);
     }
     if (overlaps(room.getId(), input.startDate(), input.endDate(), id))
@@ -88,6 +96,6 @@ public class BookingService {
   private void requireReserved(Booking booking) {
     if (booking.getStatus() != BookingStatus.RESERVED)
       throw new ResponseStatusException(
-          CONFLICT, "Змінювати або скасовувати можна лише бронювання до заселення");
+        CONFLICT, "Змінювати або скасовувати можна лише бронювання до заселення");
   }
 }

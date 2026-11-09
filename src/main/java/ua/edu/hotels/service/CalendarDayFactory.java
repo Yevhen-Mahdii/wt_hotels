@@ -1,21 +1,28 @@
 package ua.edu.hotels.service;
 
-import java.time.*;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ua.edu.hotels.data.dto.CalendarDay;
-import ua.edu.hotels.data.entity.*;
-import ua.edu.hotels.data.enums.*;
+import ua.edu.hotels.data.entity.Booking;
+import ua.edu.hotels.data.entity.Room;
+import ua.edu.hotels.data.entity.Stay;
+import ua.edu.hotels.data.enums.BookingStatus;
+import ua.edu.hotels.data.enums.RoomState;
 
-/** Combines planned reservations and actual occupancy without hiding conflicting states. */
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Combines planned reservations and actual occupancy without hiding conflicting states.
+ */
 @Component
 @RequiredArgsConstructor
 public class CalendarDayFactory {
   private final StayCalculator stayCalculator;
 
   public CalendarDay create(
-      Room room, LocalDate date, LocalDate today, List<Booking> bookings, List<Stay> stays) {
+    Room room, LocalDate date, LocalDate today, List<Booking> bookings, List<Stay> stays) {
     List<String> states = new ArrayList<>();
     List<Long> bookingIds = new ArrayList<>();
     for (Booking booking : bookings) {
@@ -26,8 +33,8 @@ public class CalendarDayFactory {
     }
     // Today reflects availability now; a completed billable day must not keep a room occupied.
     boolean occupied = date.equals(today)
-        ? room.getState() == RoomState.OCCUPIED
-        : stays.stream().anyMatch(stay -> occupies(stay, date, today));
+      ? room.getState() == RoomState.OCCUPIED
+      : stays.stream().anyMatch(stay -> occupies(stay, date, today));
     if (occupied)
       states.add(RoomState.OCCUPIED.name());
     if (date.equals(today) && room.getState() == RoomState.CLEANING)
@@ -39,9 +46,9 @@ public class CalendarDayFactory {
   private boolean occupies(Stay stay, LocalDate date, LocalDate today) {
     LocalDate first = stayCalculator.accountingDay(stay.getCheckedInAt());
     LocalDate end =
-        stay.getCheckedOutAt() == null
-            ? today.plusDays(1)
-            : stayCalculator.accountingDay(stay.getCheckedOutAt());
+      stay.getCheckedOutAt() == null
+        ? today.plusDays(1)
+        : stayCalculator.accountingDay(stay.getCheckedOutAt());
     if (!end.isAfter(first)) end = first.plusDays(1);
     return !date.isBefore(first) && date.isBefore(end);
   }

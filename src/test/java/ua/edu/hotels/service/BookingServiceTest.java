@@ -6,6 +6,7 @@ import static ua.edu.hotels.support.Fixtures.*;
 
 import java.time.LocalDate;
 import java.util.*;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -16,18 +17,22 @@ import ua.edu.hotels.data.entity.*;
 import ua.edu.hotels.data.enums.*;
 import ua.edu.hotels.repository.BookingRepository;
 
-/** Checks booking permissions, overlap rejection and allowed reservation transitions. */
+/**
+ * Checks booking permissions, overlap rejection and allowed reservation transitions.
+ */
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
-  @Mock BookingRepository bookingRepository;
-  @Mock RoomService roomService;
+  @Mock
+  BookingRepository bookingRepository;
+  @Mock
+  RoomService roomService;
   BookingService bookingService;
 
   @BeforeEach
   void setup() {
     bookingService =
-        new BookingService(
-            bookingRepository, roomService, new DateRangePolicy(CLOCK));
+      new BookingService(
+        bookingRepository, roomService, new DateRangePolicy(CLOCK));
   }
 
   BookingInput input() {
@@ -37,7 +42,7 @@ class BookingServiceTest {
   @Test
   void onlyAdministratorCanBook() {
     assertThatThrownBy(() -> bookingService.save(user(Role.MANAGER), null, input()))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
     verifyNoInteractions(roomService, bookingRepository);
   }
 
@@ -46,7 +51,7 @@ class BookingServiceTest {
     when(roomService.lock(20L)).thenReturn(room(RoomState.FREE));
     when(bookingRepository.hasOverlap(eq(20L), any(), any(), isNull(), anyList())).thenReturn(true);
     assertThatThrownBy(() -> bookingService.save(user(Role.ADMINISTRATOR), null, input()))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
     var order = inOrder(roomService, bookingRepository);
     order.verify(roomService).lock(20L);
     order.verify(bookingRepository).hasOverlap(eq(20L), any(), any(), isNull(), anyList());
@@ -71,8 +76,8 @@ class BookingServiceTest {
     small.setBeds(1);
     when(roomService.list(any(), isNull())).thenReturn(List.of(small, larger, exact));
     var result =
-        bookingService.search(
-            user(Role.ADMINISTRATOR), input().startDate(), input().endDate(), 2, null);
+      bookingService.search(
+        user(Role.ADMINISTRATOR), input().startDate(), input().endDate(), 2, null);
     assertThat(result.exact()).containsExactly(exact);
     assertThat(result.larger()).containsExactly(larger);
   }
@@ -97,7 +102,7 @@ class BookingServiceTest {
     when(roomService.lock(20L)).thenReturn(room(RoomState.FREE));
     when(bookingRepository.findById(30L)).thenReturn(Optional.of(existing));
     assertThatThrownBy(() -> bookingService.save(user(Role.ADMINISTRATOR), 30L, input()))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
     assertThat(existing.getRoomId()).isEqualTo(99L);
     verify(bookingRepository, never()).save(any());
   }
@@ -110,7 +115,7 @@ class BookingServiceTest {
     var changed = new BookingInput(20L, input().startDate().plusDays(1), input().endDate().plusDays(1));
     bookingService.save(user(Role.ADMINISTRATOR), 30L, changed);
     verify(bookingRepository).hasOverlap(20L, changed.startDate(), changed.endDate(), 30L,
-        List.of(BookingStatus.RESERVED, BookingStatus.CHECKED_IN));
+      List.of(BookingStatus.RESERVED, BookingStatus.CHECKED_IN));
     assertThat(existing.getStartDate()).isEqualTo(changed.startDate());
     assertThat(existing.getEndDate()).isEqualTo(changed.endDate());
   }
@@ -122,6 +127,6 @@ class BookingServiceTest {
     when(bookingRepository.findRoomIdById(30L)).thenReturn(Optional.of(20L));
     when(bookingRepository.findById(30L)).thenReturn(Optional.of(booking));
     assertThatThrownBy(() -> bookingService.cancel(user(Role.ADMINISTRATOR), 30L))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
   }
 }

@@ -1,14 +1,18 @@
 package ua.edu.hotels.data.entity;
 
-import jakarta.persistence.*;
-import java.math.BigDecimal;
-import java.time.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ua.edu.hotels.data.enums.*;
 
-/** Stores the checkout-time revenue snapshot; each stay can produce only one revenue record. */
+import java.math.BigDecimal;
+import java.time.Instant;
+
+/**
+ * Stores the checkout-time revenue snapshot; each stay can produce only one revenue record.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

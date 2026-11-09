@@ -1,16 +1,23 @@
 package ua.edu.hotels.controller;
 
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-import ua.edu.hotels.data.dto.*;
-import ua.edu.hotels.data.entity.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ua.edu.hotels.data.dto.UserInput;
+import ua.edu.hotels.data.entity.User;
 import ua.edu.hotels.security.HotelToken;
-import ua.edu.hotels.service.*;
+import ua.edu.hotels.service.UserService;
 
-/** Exposes staff account management; system administrator access is enforced by the service. */
+import java.util.List;
+
+/**
+ * Exposes staff account management; system administrator access is enforced by the service.
+ */
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor

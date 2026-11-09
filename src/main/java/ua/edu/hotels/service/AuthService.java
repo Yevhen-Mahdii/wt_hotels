@@ -1,19 +1,22 @@
 package ua.edu.hotels.service;
 
-import static org.springframework.http.HttpStatus.*;
-
-import java.time.*;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import ua.edu.hotels.data.dto.*;
-import ua.edu.hotels.data.entity.*;
-import ua.edu.hotels.data.enums.*;
-import ua.edu.hotels.repository.*;
+import ua.edu.hotels.data.dto.AuthResponse;
+import ua.edu.hotels.data.dto.Credentials;
+import ua.edu.hotels.data.entity.User;
+import ua.edu.hotels.data.enums.Role;
+import ua.edu.hotels.repository.SetupLockRepository;
+import ua.edu.hotels.repository.UserRepository;
 
-/** Handles login and serializes first-run administrator creation in a database transaction. */
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+
+/**
+ * Handles login and serializes first-run administrator creation in a database transaction.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -42,9 +45,9 @@ public class AuthService {
 
   public AuthResponse login(Credentials input) {
     User user =
-        userRepository
-            .findByEmail(PasswordService.normalizeEmail(input.email()))
-            .orElseThrow(this::invalidCredentials);
+      userRepository
+        .findByEmail(PasswordService.normalizeEmail(input.email()))
+        .orElseThrow(this::invalidCredentials);
     if (!passwordService.matches(input.password(), user.getPasswordHash()))
       throw invalidCredentials();
     return new AuthResponse(jwtService.issue(user), user);
@@ -53,8 +56,8 @@ public class AuthService {
   public User current(ua.edu.hotels.security.HotelToken token) {
     if (token == null) throw new ResponseStatusException(UNAUTHORIZED);
     return userRepository
-        .findById(token.getUserId())
-        .orElseThrow(() -> new ResponseStatusException(UNAUTHORIZED));
+      .findById(token.getUserId())
+      .orElseThrow(() -> new ResponseStatusException(UNAUTHORIZED));
   }
 
   private ResponseStatusException invalidCredentials() {

@@ -1,14 +1,17 @@
 package ua.edu.hotels.security;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-
-import java.security.Principal;
-import java.util.Objects;
 import lombok.Value;
 import org.springframework.web.server.ResponseStatusException;
 import ua.edu.hotels.data.enums.Role;
 
-/** Immutable identity for one verified request; contains neither JWT nor password. */
+import java.security.Principal;
+import java.util.Objects;
+
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+
+/**
+ * Immutable identity for one verified request; contains neither JWT nor password.
+ */
 @Value
 public class HotelToken implements Principal {
   Long userId;
@@ -16,12 +19,16 @@ public class HotelToken implements Principal {
   Role role;
   Long hotelId;
 
-  /** Tests exact membership; roles do not inherit privileges from one another. */
+  /**
+   * Tests exact membership; roles do not inherit privileges from one another.
+   */
   public boolean hasRole(Role target) {
     return target != null && role == target;
   }
 
-  /** Enforces exact role permissions without inheriting another role's privileges. */
+  /**
+   * Enforces exact role permissions without inheriting another role's privileges.
+   */
   public void requireRole(Role expected) {
     if (!hasRole(expected)) throw new ResponseStatusException(FORBIDDEN, "Недостатньо прав");
   }
@@ -39,7 +46,7 @@ public class HotelToken implements Principal {
   public void requireRevenueAccess() {
     if (hasRole(Role.ADMIN))
       throw new ResponseStatusException(
-          FORBIDDEN, "Фінансові дані доступні Адміністратору та Керуючому");
+        FORBIDDEN, "Фінансові дані доступні Адміністратору та Керуючому");
   }
 
   @Override

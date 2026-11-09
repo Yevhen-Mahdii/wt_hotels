@@ -7,11 +7,14 @@ import static org.assertj.core.api.Assertions.*;
 import static ua.edu.hotels.support.Fixtures.CLOCK;
 
 import java.time.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-/** Checks noon boundaries and minimum-night accounting using a deterministic clock. */
+/**
+ * Checks noon boundaries and minimum-night accounting using a deterministic clock.
+ */
 @ExtendWith(MockitoExtension.class)
 class StayCalculatorTest {
   private final StayCalculator stayCalculator = new StayCalculator(CLOCK);
@@ -25,7 +28,7 @@ class StayCalculatorTest {
   })
   void accountingDateUsesKyivNoon(String instant, String expected) {
     assertThat(stayCalculator.accountingDay(Instant.parse(instant)))
-        .isEqualTo(LocalDate.parse(expected));
+      .isEqualTo(LocalDate.parse(expected));
   }
 
   @ParameterizedTest
@@ -43,7 +46,7 @@ class StayCalculatorTest {
   @Test
   void rejectsCheckoutBeforeCheckIn() {
     assertThatThrownBy(
-            () -> stayCalculator.nights(CLOCK.instant(), CLOCK.instant().minusSeconds(1)))
-        .isInstanceOf(IllegalArgumentException.class);
+      () -> stayCalculator.nights(CLOCK.instant(), CLOCK.instant().minusSeconds(1)))
+      .isInstanceOf(IllegalArgumentException.class);
   }
 }

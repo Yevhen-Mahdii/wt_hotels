@@ -1,19 +1,19 @@
 package ua.edu.hotels.service;
 
-import static org.springframework.http.HttpStatus.*;
-
-import java.time.*;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.edu.hotels.data.dto.*;
-import ua.edu.hotels.data.entity.*;
-import ua.edu.hotels.data.enums.*;
-import ua.edu.hotels.repository.*;
+import ua.edu.hotels.data.dto.HotelInput;
+import ua.edu.hotels.data.entity.Hotel;
+import ua.edu.hotels.data.enums.Role;
+import ua.edu.hotels.repository.HotelRepository;
 import ua.edu.hotels.security.HotelToken;
 
-/** Allows system administrators to maintain hotels and limits manager visibility. */
+import java.util.List;
+
+/**
+ * Allows system administrators to maintain hotels and limits manager visibility.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -27,8 +27,8 @@ public class HotelService {
 
   public List<Hotel> list(HotelToken actor) {
     return actor.hasRole(Role.MANAGER)
-        ? List.of(get(actor.getHotelId()))
-        : hotelRepository.findAllByOrderByNameAsc();
+      ? List.of(get(actor.getHotelId()))
+      : hotelRepository.findAllByOrderByNameAsc();
   }
 
   @Transactional

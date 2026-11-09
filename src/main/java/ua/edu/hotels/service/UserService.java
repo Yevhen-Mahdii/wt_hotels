@@ -1,20 +1,22 @@
 package ua.edu.hotels.service;
 
-import static org.springframework.http.HttpStatus.*;
-
-import java.time.*;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import ua.edu.hotels.data.dto.*;
-import ua.edu.hotels.data.entity.*;
-import ua.edu.hotels.data.enums.*;
-import ua.edu.hotels.repository.*;
+import ua.edu.hotels.data.dto.UserInput;
+import ua.edu.hotels.data.entity.User;
+import ua.edu.hotels.data.enums.Role;
+import ua.edu.hotels.repository.UserRepository;
 import ua.edu.hotels.security.HotelToken;
 
-/** Creates staff accounts with one role and a hotel assignment only for managers. */
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+
+/**
+ * Creates staff accounts with one role and a hotel assignment only for managers.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

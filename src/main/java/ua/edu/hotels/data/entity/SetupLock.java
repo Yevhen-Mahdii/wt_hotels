@@ -6,11 +6,14 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/** Maps the permanent singleton row created by Flyway for first-run setup serialization. */
+/**
+ * Maps the permanent singleton row created by Flyway for first-run setup serialization.
+ */
 @Getter
 @NoArgsConstructor
 @Entity
 @Table(name = "setup_lock")
 public class SetupLock {
-  @Id private Integer id;
+  @Id
+  private Integer id;
 }

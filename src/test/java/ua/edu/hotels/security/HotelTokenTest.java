@@ -10,7 +10,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import ua.edu.hotels.data.enums.Role;
 
-/** Checks exact role matching and the principal identity contract. */
+/**
+ * Checks exact role matching and the principal identity contract.
+ */
 @ExtendWith(MockitoExtension.class)
 class HotelTokenTest {
   @ParameterizedTest

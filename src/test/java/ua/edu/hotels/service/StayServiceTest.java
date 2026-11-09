@@ -6,6 +6,7 @@ import static ua.edu.hotels.support.Fixtures.*;
 
 import java.math.BigDecimal;
 import java.util.*;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -15,27 +16,34 @@ import ua.edu.hotels.data.entity.*;
 import ua.edu.hotels.data.enums.*;
 import ua.edu.hotels.repository.*;
 
-/** Checks occupancy transitions, check-in pricing and checkout revenue recording. */
+/**
+ * Checks occupancy transitions, check-in pricing and checkout revenue recording.
+ */
 @ExtendWith(MockitoExtension.class)
 class StayServiceTest {
-  @Mock RoomService roomService;
-  @Mock StayRepository stayRepository;
-  @Mock BookingRepository bookingRepository;
-  @Mock BookingService bookingService;
-  @Mock RevenueRepository revenueRepository;
+  @Mock
+  RoomService roomService;
+  @Mock
+  StayRepository stayRepository;
+  @Mock
+  BookingRepository bookingRepository;
+  @Mock
+  BookingService bookingService;
+  @Mock
+  RevenueRepository revenueRepository;
   StayService stayService;
 
   @BeforeEach
   void setup() {
     stayService =
-        new StayService(
-            roomService,
-            stayRepository,
-            bookingRepository,
-            bookingService,
-            revenueRepository,
-            new StayCalculator(CLOCK),
-            CLOCK);
+      new StayService(
+        roomService,
+        stayRepository,
+        bookingRepository,
+        bookingService,
+        revenueRepository,
+        new StayCalculator(CLOCK),
+        CLOCK);
   }
 
   @Test
@@ -55,7 +63,7 @@ class StayServiceTest {
   void dirtyRoomCannotBeOccupied() {
     when(roomService.lock(20L)).thenReturn(room(RoomState.CLEANING));
     assertThatThrownBy(() -> stayService.checkIn(user(Role.MANAGER), 20L, null))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
     verifyNoInteractions(stayRepository, revenueRepository);
   }
 
@@ -64,7 +72,7 @@ class StayServiceTest {
     when(roomService.lock(20L)).thenReturn(room(RoomState.FREE));
     when(bookingService.overlaps(eq(20L), any(), any(), isNull())).thenReturn(true);
     assertThatThrownBy(() -> stayService.checkIn(user(Role.MANAGER), 20L, null))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
     verify(stayRepository, never()).save(any());
   }
 
@@ -94,7 +102,7 @@ class StayServiceTest {
     assertThat(room.getState()).isEqualTo(RoomState.CLEANING);
     assertThat(booking.getStatus()).isEqualTo(BookingStatus.COMPLETED);
     assertThatThrownBy(() -> stayService.checkOut(user(Role.MANAGER), 20L))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
     verify(revenueRepository, times(1)).save(any());
   }
 
@@ -111,7 +119,7 @@ class StayServiceTest {
   void cannotCleanOccupiedRoom() {
     when(roomService.lock(20L)).thenReturn(room(RoomState.OCCUPIED));
     assertThatThrownBy(() -> stayService.completeCleaning(user(Role.MANAGER), 20L))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
   }
 
   @Test
@@ -120,7 +128,7 @@ class StayServiceTest {
     room.setHotelId(11L);
     when(roomService.lock(20L)).thenReturn(room);
     assertThatThrownBy(() -> stayService.checkIn(user(Role.MANAGER), 20L, null))
-        .isInstanceOf(ResponseStatusException.class);
+      .isInstanceOf(ResponseStatusException.class);
     verifyNoInteractions(stayRepository, revenueRepository);
   }
 }

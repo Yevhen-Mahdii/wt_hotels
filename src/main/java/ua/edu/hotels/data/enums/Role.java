@@ -3,7 +3,9 @@ package ua.edu.hotels.data.enums;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/** Codes are persistent identifiers. Never reuse or reorder codes in migrations. */
+/**
+ * Codes are persistent identifiers. Never reuse or reorder codes in migrations.
+ */
 @Getter
 @RequiredArgsConstructor
 public enum Role implements CodedEnum {
@@ -15,8 +17,8 @@ public enum Role implements CodedEnum {
 
   public static Role fromCode(int code) {
     return java.util.Arrays.stream(values())
-        .filter(role -> role.code == code)
-        .findFirst()
-        .orElseThrow(() -> new IllegalArgumentException("Unknown role code: " + code));
+      .filter(role -> role.code == code)
+      .findFirst()
+      .orElseThrow(() -> new IllegalArgumentException("Unknown role code: " + code));
   }
 }

@@ -1,20 +1,23 @@
 package ua.edu.hotels.service;
 
-import static org.springframework.http.HttpStatus.*;
-
-import java.time.*;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import ua.edu.hotels.data.dto.*;
-import ua.edu.hotels.data.entity.*;
-import ua.edu.hotels.data.enums.*;
-import ua.edu.hotels.repository.*;
+import ua.edu.hotels.data.dto.RoomInput;
+import ua.edu.hotels.data.entity.Room;
+import ua.edu.hotels.data.enums.Role;
+import ua.edu.hotels.repository.RoomRepository;
 import ua.edu.hotels.security.HotelToken;
 
-/** Maintains room details within manager scope and exposes locking for lifecycle operations. */
+import java.util.HashSet;
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+
+/**
+ * Maintains room details within manager scope and exposes locking for lifecycle operations.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -25,11 +28,13 @@ public class RoomService {
   public List<Room> list(HotelToken actor, Long hotelId) {
     Long filter = actor.hotelFilter(hotelId);
     return filter == null
-        ? roomRepository.findAllByOrderByHotelIdAscNumberAsc()
-        : roomRepository.findByHotelIdOrderByNumberAsc(filter);
+      ? roomRepository.findAllByOrderByHotelIdAscNumberAsc()
+      : roomRepository.findByHotelIdOrderByNumberAsc(filter);
   }
 
-  /** Must be called inside the mutation transaction, before reading booking or stay state. */
+  /**
+   * Must be called inside the mutation transaction, before reading booking or stay state.
+   */
   public Room lock(Long id) {
     return roomRepository.findLockedById(id).orElseThrow(ServiceErrors::notFound);
   }

@@ -2,13 +2,21 @@ package ua.edu.hotels.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-import ua.edu.hotels.data.dto.*;
-import ua.edu.hotels.data.entity.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ua.edu.hotels.data.dto.CheckInInput;
+import ua.edu.hotels.data.entity.Revenue;
+import ua.edu.hotels.data.entity.Room;
+import ua.edu.hotels.data.entity.Stay;
 import ua.edu.hotels.security.HotelToken;
-import ua.edu.hotels.service.*;
+import ua.edu.hotels.service.StayService;
 
-/** Exposes check-in, checkout and cleaning completion as explicit lifecycle operations. */
+/**
+ * Exposes check-in, checkout and cleaning completion as explicit lifecycle operations.
+ */
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -17,9 +25,9 @@ public class StayController {
 
   @PostMapping("/rooms/{id}/check-in")
   public Stay checkIn(
-      @AuthenticationPrincipal HotelToken token,
-      @PathVariable Long id,
-      @RequestBody CheckInInput in) {
+    @AuthenticationPrincipal HotelToken token,
+    @PathVariable Long id,
+    @RequestBody CheckInInput in) {
     return stayService.checkIn(token, id, in.bookingId());
   }
 

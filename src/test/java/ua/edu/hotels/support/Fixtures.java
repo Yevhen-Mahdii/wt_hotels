@@ -2,16 +2,20 @@ package ua.edu.hotels.support;
 
 import java.math.BigDecimal;
 import java.time.*;
+
 import ua.edu.hotels.data.entity.*;
 import ua.edu.hotels.data.enums.*;
 import ua.edu.hotels.security.HotelToken;
 
-/** Provides a fixed Kyiv clock and role-scoped principals for deterministic unit tests. */
+/**
+ * Provides a fixed Kyiv clock and role-scoped principals for deterministic unit tests.
+ */
 public final class Fixtures {
   public static final Clock CLOCK =
-      Clock.fixed(Instant.parse("2026-11-05T10:00:00Z"), ZoneId.of("Europe/Kyiv"));
+    Clock.fixed(Instant.parse("2026-11-05T10:00:00Z"), ZoneId.of("Europe/Kyiv"));
 
-  private Fixtures() {}
+  private Fixtures() {
+  }
 
   public static HotelToken user(Role role) {
     return new HotelToken(1L, "test@example.test", role, role == Role.MANAGER ? 10L : null);
