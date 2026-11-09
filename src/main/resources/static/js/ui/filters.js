@@ -2,11 +2,14 @@
 import { state } from "../core/state.js";
 import { fillHotelSelect } from "./components.js";
 import { notify } from "./notifications.js";
+
 export function bindFilters(container, refresh) {
   const form = container.querySelector("#filters");
   form.elements.start.value = state.filters.start;
   form.elements.end.value = state.filters.end;
-  if (form.elements.beds) form.elements.beds.value = state.filters.beds;
+  if (form.elements.beds) {
+    form.elements.beds.value = state.filters.beds;
+  }
   fillHotelSelect(form.elements.hotelId, state.filters.hotelId);
   if (state.user.role === "MANAGER") {
     form.querySelector("[data-hotel-filter]").hidden = true;
@@ -19,11 +22,7 @@ export function bindFilters(container, refresh) {
       ...state.filters,
       ...Object.fromEntries(new FormData(form)),
     };
-    history.replaceState(
-      null,
-      "",
-      location.pathname + "?" + new URLSearchParams(state.filters),
-    );
+    history.replaceState(null, "", location.pathname + "?" + new URLSearchParams(state.filters));
     const button = form.querySelector("button");
     button.disabled = true;
     try {

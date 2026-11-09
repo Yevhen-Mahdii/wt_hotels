@@ -9,41 +9,43 @@
     <!-- Each page loads only its controller, which initializes the shared session and UI. -->
     <script type="module" src="/js/pages/revenue.js"></script>
   </head>
+
   <body data-page="revenue">
-    <p id="page-status" class="loading" role="status">
-      Завантажуємо робочий простір…
-    </p>
+    <p id="page-status" class="loading" role="status">Завантажуємо робочий простір…</p>
     <div class="shell" hidden>
       <main id="main">
         <div class="page-head">
           <div>
             <div class="eyebrow" data-role-caption></div>
             <h1>Валовий дохід</h1>
-            <p id="page-description">
-              Лише завершені проживання. Без обліку оплат і витрат.
-            </p>
+            <p id="page-description">Лише завершені проживання. Без обліку оплат і витрат.</p>
           </div>
         </div>
         <form id="filters" class="filters">
-          <label>Від<input type="date" name="start" required /></label>
-          <label>До (виїзд)<input type="date" name="end" required /></label>
+          <label>
+            Від
+            <input type="date" name="start" required />
+          </label>
+          <label>
+            До (виїзд)
+            <input type="date" name="end" required />
+          </label>
 
-          <label data-hotel-filter
-            >Готель<select name="hotelId"></select
-          ></label>
+          <label data-hotel-filter>
+            Готель
+            <select name="hotelId"></select>
+          </label>
           <button type="submit">Показати</button>
         </form>
         <section class="stat">
           <div class="eyebrow">За вибраний період</div>
           <div id="total" class="amount"></div>
           <p>
-            <span id="stay-count"></span> завершених проживань · ціна фіксується
-            при заселенні
+            <span id="stay-count"></span>
+            завершених проживань · ціна фіксується при заселенні
           </p>
         </section>
-        <p id="empty" class="empty" hidden>
-          За цей період завершених проживань немає.
-        </p>
+        <p id="empty" class="empty" hidden>За цей період завершених проживань немає.</p>
         <div id="revenue-table" class="card table-wrap">
           <table class="data-table">
             <thead>
@@ -58,9 +60,8 @@
           </table>
         </div>
         <p class="help">
-          Період: від 12:00 початкової дати до 12:00 кінцевої (не включно).
-          Дохід записується при виселенні. Мінімальне проживання для розрахунку
-          — одна ніч.
+          Період: від 12:00 початкової дати до 12:00 кінцевої (не включно). Дохід записується при
+          виселенні. Мінімальне проживання для розрахунку — одна ніч.
         </p>
       </main>
     </div>

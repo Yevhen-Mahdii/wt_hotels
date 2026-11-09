@@ -4,6 +4,7 @@ import { state } from "../core/state.js";
 import { equipmentOptions } from "../core/catalog.js";
 import { fragment, element, setValues } from "../ui/templates.js";
 import { openForm } from "../ui/modal.js";
+
 export function roomForm(room, onSaved) {
   const fields = fragment("room-form-template");
   setValues(fields, {
@@ -14,8 +15,7 @@ export function roomForm(room, onSaved) {
   for (const option of equipmentOptions()) {
     const label = element("equipment-option-template");
     label.querySelector("input").value = option.name;
-    label.querySelector("input").checked =
-      room?.equipment.includes(option.name) ?? false;
+    label.querySelector("input").checked = room?.equipment.includes(option.name) ?? false;
     label.querySelector("span").textContent = option.label;
     fields.querySelector(".checks").append(label);
   }

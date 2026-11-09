@@ -8,40 +8,45 @@
     <link rel="stylesheet" href="/styles.css" />
     <script type="module" src="/js/pages/login.js"></script>
   </head>
+
   <body>
     <div class="auth-shell">
       <section class="auth-intro">
         <div class="eyebrow">Єдина мережа. Спільний простір.</div>
         <div class="auth-ornament" aria-hidden="true">⌂</div>
-        <h2>Кожен номер.<br />Усе під контролем.</h2>
+        <h2>
+          Кожен номер.
+          <br />
+          Усе під контролем.
+        </h2>
         <p>
-          Бронювання, щоденна робота готелю та підсумки — в одному спокійному
-          робочому просторі.
+          Бронювання, щоденна робота готелю та підсумки — в одному спокійному робочому просторі.
         </p>
       </section>
       <section class="auth-card">
-        <div class="brand"><span class="brand-mark">т</span>Тихий двір</div>
+        <div class="brand">
+          <span class="brand-mark">т</span>
+          Тихий двір
+        </div>
         <div id="login-caption" class="eyebrow">Раді бачити знову</div>
         <h1 id="login-title">Вхід до системи</h1>
         <p id="login-description">Увійдіть зі своїм робочим email і паролем.</p>
         <form id="login" class="form-grid">
-          <label
-            >Email<input
-              name="email"
-              type="email"
-              maxlength="180"
-              autocomplete="username"
-              required
-          /></label>
-          <label
-            >Пароль<input
+          <label>
+            Email
+            <input name="email" type="email" maxlength="180" autocomplete="username" required />
+          </label>
+          <label>
+            Пароль
+            <input
               name="password"
               type="password"
               minlength="10"
               maxlength="72"
               autocomplete="current-password"
               required
-          /></label>
+            />
+          </label>
           <p class="form-note">Щонайменше 10 символів у паролі.</p>
           <p class="form-error" role="alert"></p>
           <button type="submit" disabled>Увійти</button>

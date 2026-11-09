@@ -9,53 +9,56 @@
     <!-- Each page loads only its controller, which initializes the shared session and UI. -->
     <script type="module" src="/js/pages/search.js"></script>
   </head>
+
   <body data-page="search">
-    <p id="page-status" class="loading" role="status">
-      Завантажуємо робочий простір…
-    </p>
+    <p id="page-status" class="loading" role="status">Завантажуємо робочий простір…</p>
     <div class="shell" hidden>
       <main id="main">
         <div class="page-head">
           <div>
             <div class="eyebrow" data-role-caption></div>
             <h1>Знайти номер</h1>
-            <p id="page-description">
-              Спочатку точний збіг за ліжками, потім просторіші варіанти.
-            </p>
+            <p id="page-description">Спочатку точний збіг за ліжками, потім просторіші варіанти.</p>
           </div>
         </div>
         <form id="filters" class="filters">
-          <label>Від<input type="date" name="start" required /></label>
-          <label>До (виїзд)<input type="date" name="end" required /></label>
-          <label
-            >Ліжок<input
-              name="beds"
-              type="number"
-              min="1"
-              max="20"
-              value="2"
-              required
-          /></label>
-          <label data-hotel-filter
-            >Готель<select name="hotelId"></select
-          ></label>
+          <label>
+            Від
+            <input type="date" name="start" required />
+          </label>
+          <label>
+            До (виїзд)
+            <input type="date" name="end" required />
+          </label>
+          <label>
+            Ліжок
+            <input name="beds" type="number" min="1" max="20" value="2" required />
+          </label>
+          <label data-hotel-filter>
+            Готель
+            <select name="hotelId"></select>
+          </label>
           <button type="submit">Знайти номери</button>
         </form>
         <section data-results="exact">
           <h2 class="section-title">
-            Точно за вашим запитом <span data-count></span>
+            Точно за вашим запитом
+            <span data-count></span>
           </h2>
           <div class="grid"></div>
           <p class="empty" hidden>На вибрані дати відповідних номерів немає.</p>
         </section>
         <section data-results="larger">
-          <h2 class="section-title">Є більше ліжок <span data-count></span></h2>
+          <h2 class="section-title">
+            Є більше ліжок
+            <span data-count></span>
+          </h2>
           <div class="grid"></div>
           <p class="empty" hidden>На вибрані дати відповідних номерів немає.</p>
         </section>
         <p class="help">
-          Показано поточний стан номерів. Майбутні бронювання перевіряються
-          окремо за вибраними датами.
+          Показано поточний стан номерів. Майбутні бронювання перевіряються окремо за вибраними
+          датами.
         </p>
       </main>
     </div>

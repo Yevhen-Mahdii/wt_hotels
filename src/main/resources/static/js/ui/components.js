@@ -2,12 +2,14 @@
 import { state } from "../core/state.js";
 import { stateLabel } from "../core/catalog.js";
 import { element } from "./templates.js";
+
 export function badge(name) {
   const node = element("badge-template");
   node.classList.add(name);
   node.textContent = stateLabel(name);
   return node;
 }
+
 export function fillHotelSelect(select, selected = "") {
   select.replaceChildren(
     new Option("Усі готелі", ""),

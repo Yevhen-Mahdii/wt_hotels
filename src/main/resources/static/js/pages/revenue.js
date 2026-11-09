@@ -5,6 +5,7 @@ import { rest } from "../core/rest.js";
 import { money, timestampLabel } from "../core/format.js";
 import { element, text } from "../ui/templates.js";
 import { bindFilters } from "../ui/filters.js";
+
 async function render(main) {
   const data = await rest.revenue(state.filters);
   text(main, "#total", money(data.total));
@@ -22,4 +23,5 @@ async function render(main) {
   main.querySelector("#revenue-table").hidden = data.items.length === 0;
   main.querySelector("#empty").hidden = data.items.length > 0;
 }
+
 startPage(render, (main, { refresh }) => bindFilters(main, refresh));

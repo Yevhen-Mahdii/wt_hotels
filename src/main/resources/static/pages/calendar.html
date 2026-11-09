@@ -9,28 +9,32 @@
     <!-- Each page loads only its controller, which initializes the shared session and UI. -->
     <script type="module" src="/js/pages/calendar.js"></script>
   </head>
+
   <body data-page="calendar">
-    <p id="page-status" class="loading" role="status">
-      Завантажуємо робочий простір…
-    </p>
+    <p id="page-status" class="loading" role="status">Завантажуємо робочий простір…</p>
     <div class="shell" hidden>
       <main id="main">
         <div class="page-head">
           <div>
             <div class="eyebrow" data-role-caption></div>
             <h1>Розклад номерів</h1>
-            <p id="page-description">
-              Бронювання наперед і фактичний стан — поруч.
-            </p>
+            <p id="page-description">Бронювання наперед і фактичний стан — поруч.</p>
           </div>
         </div>
         <form id="filters" class="filters">
-          <label>Від<input type="date" name="start" required /></label>
-          <label>До (виїзд)<input type="date" name="end" required /></label>
+          <label>
+            Від
+            <input type="date" name="start" required />
+          </label>
+          <label>
+            До (виїзд)
+            <input type="date" name="end" required />
+          </label>
 
-          <label data-hotel-filter
-            >Готель<select name="hotelId"></select
-          ></label>
+          <label data-hotel-filter>
+            Готель
+            <select name="hotelId"></select>
+          </label>
           <button type="submit">Показати</button>
         </form>
         <div class="legend" id="legend"></div>
@@ -53,9 +57,9 @@
           </table>
         </div>
         <p class="help">
-          На смартфоні гортайте розклад убік. Помаранчева рамка позначає
-          накладку. Межа доби — 12:00 за Києвом. Майбутній стан «Вільно» означає
-          відсутність бронювання, а не підтвердження прибирання.
+          На смартфоні гортайте розклад убік. Помаранчева рамка позначає накладку. Межа доби — 12:00
+          за Києвом. Майбутній стан «Вільно» означає відсутність бронювання, а не підтвердження
+          прибирання.
         </p>
       </main>
     </div>

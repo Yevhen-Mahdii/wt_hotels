@@ -2,24 +2,31 @@
 import { rest } from "../core/rest.js";
 import { session } from "../core/session.js";
 import { afterLoginUrl } from "../core/routes.js";
+
 const form = document.querySelector("#login");
 const button = form.querySelector("button");
 const errorLabel = form.querySelector(".form-error");
+
 let setup = false;
+
 async function boot() {
   try {
     const status = await rest.auth.status();
     setup = status.setupRequired;
+
     if (session.token && !setup) {
       try {
         const user = await rest.auth.me();
         location.replace(afterLoginUrl(user.role));
         return;
       } catch (error) {
-        if (error.status !== 401) throw error;
+        if (error.status !== 401) {
+          throw error;
+        }
         session.clear();
       }
     }
+
     if (setup) {
       session.clear();
       document.querySelector("#login-caption").textContent = "Перший запуск";
@@ -29,15 +36,18 @@ async function boot() {
       form.elements.password.autocomplete = "new-password";
       button.textContent = "Створити Адміна";
     }
+
     button.disabled = false;
   } catch (error) {
     errorLabel.textContent = error.message;
   }
 }
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   button.disabled = true;
   errorLabel.textContent = "";
+
   try {
     const response = await (setup ? rest.auth.setup : rest.auth.login)(
       Object.fromEntries(new FormData(form)),
@@ -49,7 +59,11 @@ form.addEventListener("submit", async (event) => {
     button.disabled = false;
   }
 });
+
 window.addEventListener("pageshow", (event) => {
-  if (event.persisted) location.reload();
+  if (event.persisted) {
+    location.reload();
+  }
 });
+
 boot();
