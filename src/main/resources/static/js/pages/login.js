@@ -1,7 +1,7 @@
 /** Binds the static login page; first-run setup uses the same form with different labels. */
-import { rest } from "../core/rest.js";
-import { session } from "../core/session.js";
-import { afterLoginUrl } from "../core/routes.js";
+import {rest} from "../core/rest.js";
+import {session} from "../core/session.js";
+import {afterLoginUrl} from "../core/routes.js";
 
 const form = document.querySelector("#login");
 const button = form.querySelector("button");
@@ -49,9 +49,16 @@ form.addEventListener("submit", async (event) => {
   errorLabel.textContent = "";
 
   try {
-    const response = await (setup ? rest.auth.setup : rest.auth.login)(
-      Object.fromEntries(new FormData(form)),
-    );
+    const credentials = {
+      email: form.elements.email.value,
+      password: form.elements.password.value,
+    };
+    let response;
+    if (setup) {
+      response = await rest.auth.setup(credentials);
+    } else {
+      response = await rest.auth.login(credentials);
+    }
     session.save(response.token);
     location.assign(afterLoginUrl(response.user.role));
   } catch (error) {

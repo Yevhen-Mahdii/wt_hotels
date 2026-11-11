@@ -1,19 +1,23 @@
 /** Loads trusted local HTML templates; API values are always assigned as text or DOM properties. */
 export async function loadTemplates() {
-  const documents = await Promise.all(
-    ["/fragments/shared.html", "/fragments/forms.html"].map(async (url) => {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error("Не вдалося завантажити шаблони сторінки.");
-      }
-      return new DOMParser().parseFromString(await response.text(), "text/html");
-    }),
-  );
+  const documents = await Promise.all([
+    loadTemplateDocument("/fragments/shared.html"),
+    loadTemplateDocument("/fragments/forms.html"),
+  ]);
   for (const source of documents) {
     for (const template of source.querySelectorAll("template")) {
       document.body.append(document.importNode(template, true));
     }
   }
+}
+
+async function loadTemplateDocument(url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error("Не вдалося завантажити шаблони сторінки.");
+  }
+  const html = await response.text();
+  return new DOMParser().parseFromString(html, "text/html");
 }
 
 export function fragment(id) {
@@ -30,10 +34,4 @@ export function element(id) {
 
 export function text(root, selector, value) {
   root.querySelector(selector).textContent = value ?? "";
-}
-
-export function setValues(root, values) {
-  for (const [name, value] of Object.entries(values)) {
-    root.querySelector(`[name="${name}"]`).value = value ?? "";
-  }
 }

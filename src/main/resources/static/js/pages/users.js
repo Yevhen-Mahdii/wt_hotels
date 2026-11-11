@@ -1,24 +1,44 @@
-/** Loads staff accounts and fills user-card templates with role and hotel labels. */
-import { startPage } from "../core/page.js";
-import { rest } from "../core/rest.js";
-import { hotelName } from "../core/state.js";
-import { roleLabel } from "../core/catalog.js";
-import { element, text } from "../ui/templates.js";
-import { userForm } from "../forms/user-form.js";
+/** Owns account loading and creation; forms receive the available choices explicitly. */
+import {startPage} from "../core/page.js";
+import {rest} from "../core/rest.js";
+import {hotelName} from "../core/lookups.js";
+import {roleLabel, roleOptions} from "../core/catalog.js";
+import {element, text} from "../ui/templates.js";
+import {createUserForm} from "../forms/user-form.js";
+import {openForm} from "../ui/modal.js";
 
-async function render(main) {
-  const users = await rest.users.list();
-  main.querySelector("#items").replaceChildren(
-    ...users.map((user) => {
+startPage(async ({main}) => {
+  let hotels = [];
+
+  async function refreshUsers() {
+    const [loadedHotels, users] = await Promise.all([rest.hotels.list(), rest.users.list()]);
+    hotels = loadedHotels;
+    const cards = users.map((user) => {
       const card = element("user-card-template");
       text(card, "[data-role]", roleLabel(user.role));
       text(card, "[data-email]", user.email);
-      text(card, "[data-hotel]", user.hotelId ? hotelName(user.hotelId) : "Уся мережа");
+      text(card, "[data-hotel]", user.hotelId ? hotelName(hotels, user.hotelId) : "Уся мережа");
       return card;
-    }),
-  );
-}
+    });
+    main.querySelector("#items").replaceChildren(...cards);
+  }
 
-startPage(render, (main, { refresh }) => {
-  main.querySelector("#add-user").addEventListener("click", () => userForm(refresh));
+  function openUserEditor() {
+    const form = createUserForm({hotels, roles: roleOptions()});
+
+    async function createUser() {
+      const input = form.readValues();
+      await rest.users.create(input);
+    }
+
+    openForm({
+      title: "Новий користувач",
+      fields: form.fields,
+      onSubmit: createUser,
+      onSaved: refreshUsers,
+    });
+  }
+
+  main.querySelector("#add-user").addEventListener("click", openUserEditor);
+  await refreshUsers();
 });

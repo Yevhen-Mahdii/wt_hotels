@@ -1,5 +1,5 @@
 /** Centralizes HTTP transport, bearer authentication, API paths and error handling. */
-import { session } from "./session.js";
+import {session} from "./session.js";
 
 export class ApiError extends Error {
   constructor(message, status) {
@@ -8,28 +8,28 @@ export class ApiError extends Error {
   }
 }
 
-async function request(path, method = "GET", body) {
-  // Public bootstrap/login calls must work even when storage contains an expired or old-key JWT.
-  const authenticated = !path.startsWith("/auth/") && path !== "/catalog";
-  const response = await fetch("/api" + path, {
-    method,
-    headers: {
-      ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
-      ...(authenticated && session.token ? { Authorization: "Bearer " + session.token } : {}),
-    },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+async function request(path, {method = "GET", body, authenticated = true} = {}) {
+  const options = {method, headers: {}};
+  if (body !== undefined) {
+    options.headers["Content-Type"] = "application/json";
+    options.body = JSON.stringify(body);
+  }
+  if (authenticated && session.token) {
+    options.headers.Authorization = "Bearer " + session.token;
+  }
+
+  const response = await fetch("/api" + path, options);
   const result = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    if (response.status === 401 && !path.startsWith("/auth/")) {
+    if (response.status === 401 && authenticated) {
       session.clear();
       window.dispatchEvent(new Event("session-expired"));
     }
 
     throw new ApiError(
       result.message ||
-        (response.status === 403 ? "Недостатньо прав" : "Не вдалося виконати запит"),
+      (response.status === 403 ? "Недостатньо прав" : "Не вдалося виконати запит"),
       response.status,
     );
   }
@@ -38,46 +38,56 @@ async function request(path, method = "GET", body) {
 }
 
 function query(values) {
-  return (
-    "?" +
-    new URLSearchParams(Object.entries(values).filter(([, value]) => value !== "" && value != null))
-  );
+  const params = new URLSearchParams();
+  for (const [name, value] of Object.entries(values)) {
+    if (value !== "" && value !== null && value !== undefined) {
+      params.set(name, String(value));
+    }
+  }
+  return "?" + params.toString();
 }
 
 /** All HTTP methods and API paths live here. Views only call these named operations. */
 export const rest = {
-  catalog: () => request("/catalog"),
+  catalog: () => request("/catalog", {authenticated: false}),
 
   auth: {
-    status: () => request("/auth/status"),
+    status: () => request("/auth/status", {authenticated: false}),
     me: () => request("/me"),
-    login: (data) => request("/auth/login", "POST", data),
-    setup: (data) => request("/auth/setup", "POST", data),
+    login: (data) => request("/auth/login", {method: "POST", body: data, authenticated: false}),
+    setup: (data) => request("/auth/setup", {method: "POST", body: data, authenticated: false}),
   },
 
   hotels: {
     list: () => request("/hotels"),
-    save: (id, data) => request("/hotels" + (id ? "/" + id : ""), id ? "PUT" : "POST", data),
+    create: (data) => request("/hotels", {method: "POST", body: data}),
+    update: (id, data) => request(`/hotels/${id}`, {method: "PUT", body: data}),
   },
 
   users: {
     list: () => request("/users"),
-    create: (data) => request("/users", "POST", data),
+    create: (data) => request("/users", {method: "POST", body: data}),
   },
 
   rooms: {
     list: () => request("/rooms"),
-    save: (id, data) => request("/rooms" + (id ? "/" + id : ""), id ? "PUT" : "POST", data),
+    create: (data) => request("/rooms", {method: "POST", body: data}),
+    update: (id, data) => request(`/rooms/${id}`, {method: "PUT", body: data}),
     search: (filters) => request("/rooms/search" + query(filters)),
-    checkIn: (id, bookingId) => request("/rooms/" + id + "/check-in", "POST", { bookingId }),
-    checkOut: (id) => request("/rooms/" + id + "/check-out", "POST"),
-    completeCleaning: (id) => request("/rooms/" + id + "/clean", "POST"),
+    checkIn: (id, bookingId) =>
+      request(`/rooms/${id}/check-in`, {
+        method: "POST",
+        body: {bookingId},
+      }),
+    checkOut: (id) => request(`/rooms/${id}/check-out`, {method: "POST"}),
+    completeCleaning: (id) => request(`/rooms/${id}/clean`, {method: "POST"}),
   },
 
   bookings: {
     list: () => request("/bookings"),
-    save: (id, data) => request("/bookings" + (id ? "/" + id : ""), id ? "PUT" : "POST", data),
-    cancel: (id) => request("/bookings/" + id + "/cancel", "POST"),
+    create: (data) => request("/bookings", {method: "POST", body: data}),
+    update: (id, data) => request(`/bookings/${id}`, {method: "PUT", body: data}),
+    cancel: (id) => request(`/bookings/${id}/cancel`, {method: "POST"}),
   },
 
   calendar: (filters) => request("/calendar" + query(filters)),

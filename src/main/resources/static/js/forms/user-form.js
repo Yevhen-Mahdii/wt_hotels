@@ -1,24 +1,27 @@
-/** Populates role and hotel choices from shared data; the server enforces assignment rules. */
-import { rest } from "../core/rest.js";
-import { roleOptions } from "../core/catalog.js";
-import { fragment } from "../ui/templates.js";
-import { fillHotelSelect } from "../ui/components.js";
-import { openForm } from "../ui/modal.js";
+/** Builds account fields from the available roles and hotels. */
+import {fragment} from "../ui/templates.js";
+import {fillHotelSelect} from "../ui/components.js";
 
-export function userForm(onSaved) {
+export function createUserForm({hotels, roles}) {
   const fields = fragment("user-form-template");
-  fields
-    .querySelector('[name="role"]')
-    .replaceChildren(...roleOptions().map((role) => new Option(role.label, role.name)));
-  fillHotelSelect(fields.querySelector('[name="hotelId"]'));
-  openForm(
-    "Новий користувач",
-    fields,
-    (data) =>
-      rest.users.create({
-        ...data,
-        hotelId: data.hotelId ? +data.hotelId : null,
-      }),
-    onSaved,
-  );
+  const emailInput = fields.querySelector('[name="email"]');
+  const passwordInput = fields.querySelector('[name="password"]');
+  const roleSelect = fields.querySelector('[name="role"]');
+  const hotelSelect = fields.querySelector('[name="hotelId"]');
+
+  for (const role of roles) {
+    roleSelect.add(new Option(role.label, role.name));
+  }
+  fillHotelSelect({select: hotelSelect, hotels});
+
+  function readValues() {
+    return {
+      email: emailInput.value,
+      password: passwordInput.value,
+      role: roleSelect.value,
+      hotelId: hotelSelect.value === "" ? null : Number(hotelSelect.value),
+    };
+  }
+
+  return {fields, readValues};
 }

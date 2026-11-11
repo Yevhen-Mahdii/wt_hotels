@@ -1,15 +1,16 @@
-/** Fills the hotel form template for creation or editing and submits its values to the API. */
-import { rest } from "../core/rest.js";
-import { fragment, setValues } from "../ui/templates.js";
-import { openForm } from "../ui/modal.js";
+/** Builds hotel fields without loading data or saving changes. */
+import {fragment} from "../ui/templates.js";
 
-export function hotelForm(hotel, onSaved) {
+export function createHotelForm({hotel = null} = {}) {
   const fields = fragment("hotel-form-template");
-  setValues(fields, { name: hotel?.name, address: hotel?.address });
-  openForm(
-    hotel ? "Редагувати готель" : "Новий готель",
-    fields,
-    (data) => rest.hotels.save(hotel?.id, data),
-    onSaved,
-  );
+  const nameInput = fields.querySelector('[name="name"]');
+  const addressInput = fields.querySelector('[name="address"]');
+  nameInput.value = hotel?.name ?? "";
+  addressInput.value = hotel?.address ?? "";
+
+  function readValues() {
+    return {name: nameInput.value, address: addressInput.value};
+  }
+
+  return {fields, readValues};
 }
