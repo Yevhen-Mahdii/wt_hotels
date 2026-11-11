@@ -1,5 +1,5 @@
 /** Loads enum metadata before rendering; labels stay owned by the Java backend. */
-import { rest } from "./rest.js";
+import {rest} from "./rest.js";
 
 let catalog;
 

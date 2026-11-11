@@ -1,16 +1,14 @@
-/** Initializes one HTML page: session, shared templates, data and its own page controller. */
-import { rest } from "./rest.js";
-import { state } from "./state.js";
-import { session } from "./session.js";
-import { loadCatalog } from "./catalog.js";
-import { today, addDays } from "./format.js";
-import { allowedPages, homeUrl, loginUrl } from "./routes.js";
-import { loadTemplates } from "../ui/templates.js";
-import { mountShell } from "../ui/shell.js";
-import { mountModal } from "../ui/modal.js";
-import { notify } from "../ui/notifications.js";
+/** Checks access and mounts shared UI before handing control to the page. */
+import {rest} from "./rest.js";
+import {session} from "./session.js";
+import {loadCatalog} from "./catalog.js";
+import {allowedPages, homeUrl, loginUrl} from "./routes.js";
+import {loadTemplates} from "../ui/templates.js";
+import {mountShell} from "../ui/shell.js";
+import {mountModal} from "../ui/modal.js";
+import {notify} from "../ui/notifications.js";
 
-export async function startPage(render, bind = () => {}) {
+export async function startPage(initialize) {
   const status = document.querySelector("#page-status");
   const main = document.querySelector("#main");
 
@@ -33,44 +31,26 @@ export async function startPage(render, bind = () => {}) {
       return;
     }
 
-    state.user = await rest.auth.me();
-    state.page = document.body.dataset.page;
-    if (!allowedPages(state.user.role).includes(state.page)) {
-      location.replace(homeUrl(state.user.role));
+    const user = await rest.auth.me();
+    const page = document.body.dataset.page;
+    if (!allowedPages(user.role).includes(page)) {
+      location.replace(homeUrl(user.role));
       return;
     }
 
     await Promise.all([loadCatalog(), loadTemplates()]);
 
-    const params = new URLSearchParams(location.search);
-    state.filters = {
-      start: params.get("start") || today(),
-      end: params.get("end") || addDays(today(), 7),
-      beds: params.get("beds") || 2,
-      hotelId: params.get("hotelId") || "",
-    };
-    if (state.user.role === "MANAGER") {
-      state.filters.hotelId = "";
-    }
-
-    mountShell(() => {
-      session.clear();
-      location.replace("/index.html");
+    mountShell({
+      user,
+      page,
+      onLogout() {
+        session.clear();
+        location.replace("/index.html");
+      },
     });
     mountModal();
 
-    // Refresh data and replace cards after mutations; bind stable page listeners only once below.
-    const refresh = async () => {
-      [state.hotels, state.rooms, state.bookings] = await Promise.all([
-        rest.hotels.list(),
-        rest.rooms.list(),
-        rest.bookings.list(),
-      ]);
-      await render(main, { refresh });
-    };
-
-    await refresh();
-    bind(main, { refresh });
+    await initialize({main, user});
 
     status.hidden = true;
     document.querySelector(".shell").hidden = false;
@@ -80,6 +60,6 @@ export async function startPage(render, bind = () => {}) {
     }
 
     status.textContent = "Не вдалося завантажити сторінку. Оновіть її, щоб повторити спробу.";
-    notify(error.message, true);
+    notify(error.message, {error: true});
   }
 }
